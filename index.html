@@ -1,505 +1,263 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Firebase Analytics Dashboard</title>
+    <title>SOUAIBOU TÉLÉCOM - Vente tous appareil Apple et accessoires</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        :root {
-            --primary: #4285F4;
-            --secondary: #34A853;
-            --accent: #FBBC05;
-            --danger: #EA4335;
-            --dark: #202124;
-            --light: #F8F9FA;
-            --gray: #5F6368;
-            --border-radius: 12px;
-            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        body {
-            background-color: #F5F7F9;
-            color: var(--dark);
-            line-height: 1.6;
-        }
-
-        .container {
-            display: grid;
-            grid-template-columns: 250px 1fr;
-            min-height: 100vh;
-        }
-
-        /* Sidebar Styles */
-        .sidebar {
-            background: var(--dark);
-            color: white;
-            padding: 20px;
-            position: fixed;
-            width: 250px;
-            height: 100%;
-            overflow-y: auto;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .logo i {
-            font-size: 28px;
-            color: var(--accent);
-            margin-right: 10px;
-        }
-
-        .logo h1 {
-            font-size: 20px;
-            font-weight: 600;
-        }
-
-        .menu-item {
-            display: flex;
-            align-items: center;
-            padding: 12px 15px;
-            margin-bottom: 8px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .menu-item:hover, .menu-item.active {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .menu-item i {
-            margin-right: 12px;
-            font-size: 18px;
-        }
-
-        /* Main Content Styles */
-        .main-content {
-            grid-column: 2;
-            padding: 30px;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-
-        .header h2 {
-            font-size: 24px;
-            font-weight: 600;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .user-info img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .stat-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .stat-header i {
-            font-size: 24px;
-            color: var(--primary);
-            background: rgba(66, 133, 244, 0.1);
-            padding: 10px;
-            border-radius: 8px;
-        }
-
-        .stat-value {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .stat-title {
-            color: var(--gray);
-            font-size: 14px;
-        }
-
-        /* Charts */
-        .charts-container {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .chart-card {
-            background: white;
-            padding: 20px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-        }
-
-        .chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .chart-header h3 {
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        /* Recent Activity */
-        .activity-card {
-            background: white;
-            padding: 20px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-        }
-
-        .activity-list {
-            list-style: none;
-        }
-
-        .activity-item {
-            display: flex;
-            align-items: center;
-            padding: 15px 0;
-            border-bottom: 1px solid #eee;
-        }
-
-        .activity-item:last-child {
-            border-bottom: none;
-        }
-
-        .activity-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 15px;
-            font-size: 16px;
-        }
-
-        .activity-details {
-            flex: 1;
-        }
-
-        .activity-title {
-            font-weight: 500;
-            margin-bottom: 4px;
-        }
-
-        .activity-time {
-            font-size: 12px;
-            color: var(--gray);
-        }
-
-        /* Responsive */
-        @media (max-width: 992px) {
-            .container {
-                grid-template-columns: 1fr;
-            }
-            
-            .sidebar {
-                display: none;
-            }
-            
-            .main-content {
-                grid-column: 1;
-            }
-            
-            .charts-container {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 </head>
 <body>
-    <div class="container">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="logo">
-                <i class="fas fa-fire"></i>
-                <h1>Firebase Analytics</h1>
+    <!-- Navigation supérieure -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-container">
+                <img src="https://i.supaimg.com/b4a44dc2-c78a-45ff-a93b-dd14e4249939.jpg" alt="SOUAIBOU TÉLÉCOM" class="logo">
+                <div class="logo-text">
+                    <h1>SOUAIBOU TÉLÉCOM</h1>
+                    <p>Vente tous appareil Apple et accessoires</p>
+                </div>
             </div>
-            
-            <div class="menu-item active">
-                <i class="fas fa-home"></i>
-                <span>Dashboard</span>
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Rechercher un produit...">
+                <button id="searchBtn"><i class="fas fa-search"></i></button>
+                <div id="adminPasswordContainer" class="hidden">
+                    <input type="password" id="adminPasswordInput" placeholder="Mot de passe admin">
+                    <button id="adminLoginBtn"><i class="fas fa-lock"></i></button>
+                </div>
             </div>
-            
-            <div class="menu-item">
-                <i class="fas fa-chart-line"></i>
-                <span>Analytics</span>
-            </div>
-            
-            <div class="menu-item">
-                <i class="fas fa-users"></i>
-                <span>Audience</span>
-            </div>
-            
-            <div class="menu-item">
-                <i class="fas fa-bullseye"></i>
-                <span>Events</span>
-            </div>
-            
-            <div class="menu-item">
-                <i class="fas fa-map-marker-alt"></i>
-                <span>Geo Overview</span>
-            </div>
-            
-            <div class="menu-item">
-                <i class="fas fa-cog"></i>
-                <span>Settings</span>
-            </div>
-            
-            <div class="menu-item">
-                <i class="fas fa-question-circle"></i>
-                <span>Help & Support</span>
+            <div class="cart-icon-container">
+                <button id="cartBtn">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span id="cartCount">0</span>
+                </button>
             </div>
         </div>
-        
-        <!-- Main Content -->
-        <div class="main-content">
-            <div class="header">
-                <h2>Analytics Dashboard</h2>
-                <div class="user-info">
-                    <div class="notifications">
-                        <i class="fas fa-bell"></i>
-                    </div>
-                    <img src="https://xsgames.co/randomusers/avatar.php?g=male" alt="User">
-                    <span>Admin User</span>
-                </div>
+    </header>
+
+    <!-- Navigation des catégories -->
+    <nav class="categories-nav">
+        <div class="categories-container">
+            <button class="category-btn" data-category="all">Tous</button>
+            <button class="category-btn" data-category="iPhone">iPhone</button>
+            <button class="category-btn" data-category="Samsung">Samsung</button>
+            <button class="category-btn" data-category="Tecno">Tecno</button>
+            <button class="category-btn" data-category="Autres marques">Autres marques</button>
+            <button class="category-btn" data-category="AirPods">AirPods</button>
+            <button class="category-btn" data-category="Chargeur">Chargeur</button>
+            <button class="category-btn" data-category="Ecouteur">Ecouteur</button>
+            <button class="category-btn" data-category="Power Bank">Power Bank</button>
+            <button class="category-btn" data-category="Tablette">Tablette</button>
+            <button class="category-btn" data-category="Box">Box</button>
+            <button class="category-btn" data-category="Smart Watch">Smart Watch</button>
+            <button class="category-btn" data-category="Autre">Autre</button>
+        </div>
+    </nav>
+
+    <!-- Contenu principal -->
+    <main class="main-content">
+        <!-- Page d'accueil -->
+        <section id="homePage" class="page active">
+            <div class="featured-products">
+                <h2>Produits en vedette</h2>
+                <div id="featuredProducts" class="products-grid"></div>
             </div>
             
-            <!-- Stats Grid -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <h3>Users</h3>
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <div class="stat-value">12,845</div>
-                    <div class="stat-title">+12% from last week</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <h3>Events</h3>
-                        <i class="fas fa-bullseye"></i>
-                    </div>
-                    <div class="stat-value">56,312</div>
-                    <div class="stat-title">+8% from last week</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <h3>Revenue</h3>
-                        <i class="fas fa-dollar-sign"></i>
-                    </div>
-                    <div class="stat-value">$8,425</div>
-                    <div class="stat-title">+15% from last week</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <h3>Conversions</h3>
-                        <i class="fas fa-shopping-cart"></i>
-                    </div>
-                    <div class="stat-value">1,258</div>
-                    <div class="stat-title">+5% from last week</div>
-                </div>
+            <div class="all-products">
+                <h2>Tous nos produits</h2>
+                <div id="allProducts" class="products-grid"></div>
             </div>
             
-            <!-- Charts -->
-            <div class="charts-container">
-                <div class="chart-card">
-                    <div class="chart-header">
-                        <h3>User Activity</h3>
-                        <select>
-                            <option>Last 7 Days</option>
-                            <option>Last 30 Days</option>
-                            <option>Last 90 Days</option>
-                        </select>
-                    </div>
-                    <canvas id="userActivityChart"></canvas>
+            <div id="pagination" class="pagination"></div>
+        </section>
+
+        <!-- Page de détails produit -->
+        <section id="productPage" class="page">
+            <button id="backToHome" class="back-btn"><i class="fas fa-arrow-left"></i> Retour</button>
+            <div id="productDetails" class="product-details"></div>
+            <div class="related-products">
+                <h3>Vous aimerez aussi</h3>
+                <div id="relatedProducts" class="products-grid"></div>
+            </div>
+        </section>
+
+        <!-- Page panier -->
+        <section id="cartPage" class="page">
+            <h2>Votre Panier</h2>
+            <div id="cartItems" class="cart-items"></div>
+            <div class="cart-summary">
+                <div class="delivery-options">
+                    <h3>Options de livraison</h3>
+                    <select id="deliveryOption">
+                        <option value="">Sélectionnez une option</option>
+                    </select>
                 </div>
-                
-                <div class="chart-card">
-                    <div class="chart-header">
-                        <h3>Traffic Sources</h3>
-                        <select>
-                            <option>This Week</option>
-                            <option>Last Week</option>
-                        </select>
-                    </div>
-                    <canvas id="trafficSourcesChart"></canvas>
+                <div class="cart-totals">
+                    <p>Sous-total: <span id="subtotal">0 FCFA</span></p>
+                    <p>Livraison: <span id="deliveryCost">0 FCFA</span></p>
+                    <p class="total">Total: <span id="total">0 FCFA</span></p>
+                    <button id="checkoutBtn" class="checkout-btn">Commander</button>
                 </div>
             </div>
-            
-            <!-- Recent Activity -->
-            <div class="activity-card">
-                <div class="chart-header">
-                    <h3>Recent Events</h3>
-                    <button>View All</button>
-                </div>
-                
-                <ul class="activity-list">
-                    <li class="activity-item">
-                        <div class="activity-icon" style="background-color: rgba(66, 133, 244, 0.1); color: var(--primary);">
-                            <i class="fas fa-user-plus"></i>
-                        </div>
-                        <div class="activity-details">
-                            <div class="activity-title">New user registered</div>
-                            <div class="activity-time">10 minutes ago</div>
-                        </div>
-                    </li>
-                    
-                    <li class="activity-item">
-                        <div class="activity-icon" style="background-color: rgba(52, 168, 83, 0.1); color: var(--secondary);">
-                            <i class="fas fa-shopping-cart"></i>
-                        </div>
-                        <div class="activity-details">
-                            <div class="activity-title">Purchase completed</div>
-                            <div class="activity-time">42 minutes ago</div>
-                        </div>
-                    </li>
-                    
-                    <li class="activity-item">
-                        <div class="activity-icon" style="background-color: rgba(251, 188, 5, 0.1); color: var(--accent);">
-                            <i class="fas fa-video"></i>
-                        </div>
-                        <div class="activity-details">
-                            <div class="activity-title">Video playback started</div>
-                            <div class="activity-time">1 hour ago</div>
-                        </div>
-                    </li>
-                    
-                    <li class="activity-item">
-                        <div class="activity-icon" style="background-color: rgba(234, 67, 53, 0.1); color: var(--danger);">
-                            <i class="fas fa-exclamation-circle"></i>
-                        </div>
-                        <div class="activity-details">
-                            <div class="activity-title">Error in checkout process</div>
-                            <div class="activity-time">2 hours ago</div>
-                        </div>
-                    </li>
-                </ul>
+        </section>
+
+        <!-- Modal de commande -->
+        <div id="checkoutModal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h2>Finaliser votre commande</h2>
+                <form id="checkoutForm">
+                    <div class="form-group">
+                        <label for="firstName">Prénom</label>
+                        <input type="text" id="firstName">
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Nom</label>
+                        <input type="text" id="lastName">
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Téléphone <span class="required">*</span></label>
+                        <input type="tel" id="phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email">
+                    </div>
+                    <div class="order-summary">
+                        <h3>Récapitulatif de commande</h3>
+                        <div id="orderSummary"></div>
+                        <p class="delivery-notice">VOTRE COLIS SERA LIVRÉ DANS MAXIMUM 24H.</p>
+                    </div>
+                    <button type="submit" class="submit-order-btn">Confirmer la commande</button>
+                </form>
             </div>
         </div>
-    </div>
 
-    <script>
-        // Initialize charts
-        document.addEventListener('DOMContentLoaded', function() {
-            // User Activity Chart
-            const userActivityCtx = document.getElementById('userActivityChart').getContext('2d');
-            const userActivityChart = new Chart(userActivityCtx, {
-                type: 'line',
-                data: {
-                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                    datasets: [{
-                        label: 'Active Users',
-                        data: [1200, 1900, 1700, 2100, 2300, 2500, 2200],
-                        borderColor: '#4285F4',
-                        tension: 0.3,
-                        fill: true,
-                        backgroundColor: 'rgba(66, 133, 244, 0.1)'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                drawBorder: false
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            }
-                        }
-                    }
-                }
-            });
+        <!-- Page contact -->
+        <section id="contactPage" class="page">
+            <h2>Contactez-nous</h2>
+            <div class="contact-info">
+                <div class="contact-item">
+                    <i class="fas fa-phone gold-icon"></i>
+                    <h3>Téléphone</h3>
+                    <p>+221 77 123 45 67</p>
+                    <p>+221 76 987 65 43</p>
+                </div>
+                <div class="contact-item">
+                    <i class="fab fa-whatsapp gold-icon"></i>
+                    <h3>WhatsApp</h3>
+                    <p><a href="https://wa.me/221771234567">Écrivez-nous sur WhatsApp</a></p>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-map-marker-alt gold-icon"></i>
+                    <h3>Adresses</h3>
+                    <p class="address" data-address="Dakar Centre">Dakar Centre</p>
+                    <p class="address" data-address="Almadies">Almadies</p>
+                    <p class="address" data-address="Sacre Coeur">Sacre Coeur</p>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-clock gold-icon"></i>
+                    <h3>Heures d'ouverture</h3>
+                    <p>Lun - Sam: 8h - 20h</p>
+                    <p>Dimanche: 9h - 13h</p>
+                </div>
+            </div>
+        </section>
 
-            // Traffic Sources Chart
-            const trafficSourcesCtx = document.getElementById('trafficSourcesChart').getContext('2d');
-            const trafficSourcesChart = new Chart(trafficSourcesCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Direct', 'Social', 'Search', 'Referral'],
-                    datasets: [{
-                        data: [35, 25, 25, 15],
-                        backgroundColor: [
-                            '#4285F4',
-                            '#34A853',
-                            '#FBBC05',
-                            '#EA4335'
-                        ],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        }
-                    },
-                    cutout: '70%'
-                }
-            });
-        });
-    </script>
+        <!-- Page admin -->
+        <section id="adminPage" class="page">
+            <h2>Tableau de Bord Admin</h2>
+            <div class="admin-nav">
+                <button class="admin-btn" data-view="addProduct">Ajouter un Article</button>
+                <button class="admin-btn" data-view="productList">Liste des Articles</button>
+                <button class="admin-btn" data-view="pendingOrders">Commandes en Attente</button>
+                <button class="admin-btn" data-view="completedOrders">Commandes Validées</button>
+                <button class="admin-btn" data-view="rejectedOrders">Commandes Rejetées</button>
+                <button class="admin-btn" data-view="deliverySettings">Livraison</button>
+                <button class="admin-btn" data-view="adsSettings">Affiches Publicitaires</button>
+                <button id="changePasswordBtn" class="admin-btn"><i class="fas fa-lock"></i> Changer Mot de Passe</button>
+            </div>
+
+            <div id="adminContent" class="admin-content">
+                <!-- Le contenu admin sera chargé dynamiquement ici -->
+            </div>
+        </section>
+
+        <!-- Modal d'image plein écran -->
+        <div id="imageModal" class="modal">
+            <span class="close-modal">&times;</span>
+            <img class="modal-content" id="fullSizeImage">
+        </div>
+
+        <!-- Modal de notification -->
+        <div id="notificationModal" class="modal notification">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <p id="notificationMessage"></p>
+            </div>
+        </div>
+
+        <!-- Modal de confirmation -->
+        <div id="confirmationModal" class="modal">
+            <div class="modal-content">
+                <h3 id="confirmationTitle"></h3>
+                <p id="confirmationMessage"></p>
+                <div class="confirmation-buttons">
+                    <button id="confirmYes" class="confirm-btn">Oui</button>
+                    <button id="confirmNo" class="confirm-btn cancel">Non</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de changement de mot de passe -->
+        <div id="passwordModal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h2>Changer le mot de passe admin</h2>
+                <form id="passwordForm">
+                    <div class="form-group">
+                        <label for="currentPassword">Mot de passe actuel</label>
+                        <input type="password" id="currentPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newPassword">Nouveau mot de passe</label>
+                        <input type="password" id="newPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirmer le nouveau mot de passe</label>
+                        <input type="password" id="confirmPassword" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Changer le mot de passe</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Navigation inférieure -->
+    <footer class="bottom-nav">
+        <button class="nav-btn active" data-page="homePage">
+            <i class="fas fa-home"></i>
+            <span>Accueil</span>
+        </button>
+        <button class="nav-btn" data-page="categoriesPage">
+            <i class="fas fa-list"></i>
+            <span>Catégories</span>
+        </button>
+        <button class="nav-btn" data-page="cartPage">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Panier</span>
+        </button>
+        <button class="nav-btn" data-page="contactPage">
+            <i class="fas fa-phone"></i>
+            <span>Contact</span>
+        </button>
+    </footer>
+
+    <script src="script.js"></script>
 </body>
 </html>
