@@ -77,14 +77,14 @@ function checkConnection() {
 // Chargement des données
 async function loadData() {
     try {
-        // Charger les produits
+        // Charger les produits depuis Firebase
         const productsSnapshot = await db.collection('products').get();
         products = productsSnapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
         }));
         
-        // Charger les catégories
+        // CATÉGORIES LOCALES (sans Firebase)
         categories = [
             { id: 'iphone', name: 'iPhone', color: '#1428A0', icon: 'fab fa-apple' },
             { id: 'samsung', name: 'Samsung', color: '#1428A0', icon: 'fas fa-mobile-alt' },
@@ -97,11 +97,7 @@ async function loadData() {
             { id: 'tablette', name: 'Tablette', color: '#1E90FF', icon: 'fas fa-tablet-alt' },
             { id: 'ordinateur', name: 'Ordinateur', color: '#B0B0B0', icon: 'fas fa-laptop' },
             { id: 'box', name: 'Box', color: '#8A2BE2', icon: 'fas fa-tv' },
-            { id: 'smartwatch', name: 'Smart Watch', color: '#000000', icon: 'fas fa-clock' },
-            { id: 'price-100k', name: '-100 000', color: '#FF0000', icon: 'fas fa-tags' },
-            { id: 'price-70k', name: '-70 000', color: '#FF4500', icon: 'fas fa-tags' },
-            { id: 'price-50k', name: '-50 000', color: '#FFD700', icon: 'fas fa-tags' },
-            { id: 'price-25k', name: '-25 000', color: '#32CD32', icon: 'fas fa-tags' }
+            { id: 'smartwatch', name: 'Smart Watch', color: '#000000', icon: 'fas fa-clock' }
         ];
         
         // Charger les options de livraison
@@ -142,10 +138,34 @@ async function loadData() {
         
     } catch (error) {
         console.error('Erreur de chargement des données:', error);
-        showNotification('Erreur de chargement des données', 'error');
-    }
+     }
 }
 
+// Rendu des catégories
+function renderCategories() {
+    const container = document.getElementById('categories-container');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    categories.forEach(category => {
+        const categoryElement = document.createElement('div');
+        categoryElement.className = 'category-item';
+        categoryElement.innerHTML = `
+            <div class="category-icon" style="background-color: ${category.color}">
+                <i class="${category.icon}"></i>
+            </div>
+            <span>${category.name}</span>
+        `;
+        
+        // Rendre la catégorie cliquable
+        categoryElement.addEventListener('click', () => {
+            openCategoryPage(category.id);
+        });
+        
+        container.appendChild(categoryElement);
+    });
+}
 // Chargement des données locales
 function loadLocalData() {
     const savedCart = localStorage.getItem('cart');
@@ -1945,6 +1965,196 @@ async function loadAdsSettings() {
 
 // Initialisation de l'admin au chargement de la page
 if (window.location.hash === '#admin') {
-    // Si on accède à la page avec le hash #admin, afficher directement le dashboard admin
+    // Si on accède à la page avec le hash #admin, afficher direct ard admin
     navigateTo('admin-page');
+}
+
+
+
+// Ajoutez ces fonctions dans votre fichier JavaScript
+
+// Fonction pour générer un numéro de commande aléatoire
+function generateOrderNumber() {
+    return Math.floor(300000 + Math.random() * 500000); // Entre 300000 et 800000
+}
+
+// Fonction pour afficher la facture
+// Fonction pour afficher la facture (MODIFIÉE)
+function showFacture(orderData, customerInfo) {
+    const factureModal = document.getElementById('facture-modal');
+    const orderNumber = generateOrderNumber();
+    
+    // Remplir les informations de la facture
+    document.getElementById('facture-number').textContent = orderNumber;
+    document.getElementById('facture-client').textContent = customerInfo.name || 'Non spécifié';
+    document.getElementById('facture-phone').textContent = customerInfo.phone;
+    document.getElementById('facture-email').textContent = customerInfo.email || 'Non spécifié';
+    document.getElementById('facture-address').textContent = customerInfo.address || 'Non spécifié';
+    document.getElementById('facture-date').textContent = new Date().toLocaleString('fr-FR');
+    
+    // Ajouter les articles
+    const factureItems = document.getElementById('facture-items');
+    factureItems.innerHTML = '';
+    
+    let total = 0;
+    orderData.items.forEach(item => {
+        const itemTotal = item.quantity * (item.product.salePrice || item.product.normalPrice);
+        total += itemTotal;
+        
+        const itemElement = document.createElement('div');
+        itemElement.className = 'facture-item';
+        itemElement.innerHTML = `
+            <img src="${item.product.images[0]}" alt="${item.product.name}" class="facture-item-image">
+            <div class="facture-item-details">
+                <h4 class="facture-item-name">${item.product.name}</h4>
+                <p class="facture-item-price">${item.quantity} x ${formatPrice(item.product.salePrice || item.product.normalPrice)} FCFA = ${formatPrice(itemTotal)} FCFA</p>
+            </div>
+        `;
+        factureItems.appendChild(itemElement);
+    });
+    
+    // Afficher le total
+    document.getElementById('facture-total').textContent = `Total TTC: ${formatPrice(total)} FCFA`;
+    
+    // Afficher la modal
+    factureModal.classList.remove('hidden');
+    setTimeout(() => {
+        factureModal.classList.add('show');
+    }, 10);
+    
+    // Gestion du bouton de fermeture
+    document.querySelector('.close-facture').onclick = () => {
+        factureModal.classList.remove('show');
+        setTimeout(() => {
+            factureModal.classList.add('hidden');
+        }, 300);
+    };
+    
+    // Gestion du téléchargement de la facture (optionnel)
+    document.getElementById('download-facture').onclick = () => {
+        generateFacturePDF(orderNumber, customerInfo, orderData, total);
+    };
+    
+    // Mettre à jour le numéro de commande dans la base de données
+    return orderNumber;
+}
+
+// Fonction pour générer un PDF de la facture
+function generateFacturePDF(orderNumber, customerInfo, orderData, total) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    // Logo et en-tête
+    doc.addImage('https://i.supaimg.com/b4a44dc2-c78a-45ff-a93b-dd14e4249939.jpg', 'JPEG', 14, 10, 30, 30);
+    doc.setFontSize(20);
+    doc.setTextColor(20, 40, 160); // #1428A0
+    doc.text('SOUHAIBOU TÉLÉCOM', 50, 20);
+    doc.setFontSize(10);
+    doc.setTextColor(100, 100, 100);
+    doc.text('Vente tous appareil Apple et accessoires', 50, 27);
+    
+    // Numéro de commande
+    doc.setFontSize(16);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`Commande N°: ${orderNumber}`, 14, 50);
+    
+    // Informations client
+    doc.setFontSize(12);
+    doc.text(`Client: ${customerInfo.name || 'Non spécifié'}`, 14, 60);
+    doc.text(`Téléphone: ${customerInfo.phone}`, 14, 67);
+    
+    if (customerInfo.email) {
+        doc.text(`Email: ${customerInfo.email}`, 14, 74);
+    }
+    
+    if (customerInfo.address) {
+        doc.text(`Adresse: ${customerInfo.address}`, 14, customerInfo.email ? 81 : 74);
+    }
+    
+    // Date
+    const dateY = customerInfo.address ? 88 : (customerInfo.email ? 81 : 74);
+    doc.text(`Date et heure: ${new Date().toLocaleString('fr-FR')}`, 14, dateY);
+    
+    // Ligne séparatrice
+    doc.line(14, dateY + 5, 196, dateY + 5);
+    
+    // Articles
+    let yPosition = dateY + 15;
+    doc.setFontSize(12);
+    doc.setTextColor(20, 40, 160);
+    doc.text('Articles commandés:', 14, yPosition);
+    
+    yPosition += 10;
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    
+    orderData.items.forEach(item => {
+        if (yPosition > 250) {
+            doc.addPage();
+            yPosition = 20;
+        }
+        
+        const itemName = item.product.name.length > 40 ? item.product.name.substring(0, 37) + '...' : item.product.name;
+        const itemPrice = item.quantity * (item.product.salePrice || item.product.normalPrice);
+        
+        doc.text(`${item.quantity}x ${itemName}`, 20, yPosition);
+        doc.text(`${formatPrice(itemPrice)} FCFA`, 180, yPosition, { align: 'right' });
+        
+        yPosition += 7;
+    });
+    
+    // Total
+    yPosition += 5;
+    doc.setFontSize(12);
+    doc.setTextColor(20, 40, 160);
+    doc.text(`Total TTC: ${formatPrice(total)} FCFA`, 14, yPosition);
+    
+    // Pied de page
+    yPosition += 15;
+    doc.setFontSize(10);
+    doc.setTextColor(100, 100, 100);
+    doc.text('Faite une capture pour garder cette page.', 105, yPosition, { align: 'center' });
+    
+    // Sauvegarder le PDF
+    doc.save(`facture_${orderNumber}.pdf`);
+}
+
+// Modifiez la fonction de validation de commande
+async function validateOrder(orderId) {
+    try {
+        // Récupérer les détails de la commande
+        const orderDoc = await db.collection('orders').doc(orderId).get();
+        if (!orderDoc.exists) {
+            showNotification('Commande non trouvée', 'error');
+            return;
+        }
+        
+        const order = orderDoc.data();
+        
+        // Générer et afficher la facture
+        const orderNumber = showFacture(order, {
+            name: order.customerName,
+            phone: order.customerPhone,
+            email: order.customerEmail,
+            address: order.customerAddress
+        });
+        
+        // Mettre à jour le statut de la commande avec le numéro de facture
+        await db.collection('orders').doc(orderId).update({
+            status: 'completed',
+            processedAt: new Date(),
+            orderNumber: orderNumber // Ajouter le numéro de commande
+        });
+        
+        showNotification('Commande validée avec succès', 'success');
+        
+        // Recharger la liste des commandes en attente
+        setTimeout(() => {
+            loadPendingOrders();
+        }, 1000);
+        
+    } catch (error) {
+        console.error('Erreur lors de la validation de la commande:', error);
+        showNotification('Erreur lors de la validation de la commande', 'error');
+    }
 }
