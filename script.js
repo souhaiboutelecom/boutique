@@ -838,6 +838,7 @@ function renderCartPage() {
         }
     });
     
+  renderOrderHistory();
     // Ajouter l'appel dans la fonction renderCartPage
     addFactureSearchToCart();
 }
@@ -2483,7 +2484,8 @@ const orderNumber = 'ST' + Math.floor(300000 + Math.random() * 600000);
 }
 
 // Modifier également la fonction saveOrder pour qu'elle n'attende pas les paramètres de livraison
-function saveOrder(orderNumber, name, phone, email, address, total, subtotal) {
+// Fonction pour sauvegarder la commande
+function saveOrder(orderNumber, name, phone, email, address, deliveryOption, deliveryCost, total, subtotal) {
     const order = {
         id: orderNumber,
         date: new Date(),
@@ -2492,6 +2494,8 @@ function saveOrder(orderNumber, name, phone, email, address, total, subtotal) {
         customerEmail: email,
         customerAddress: address,
         items: JSON.parse(JSON.stringify(cart)), // Copie profonde du panier
+        deliveryOption: deliveryOption,
+        deliveryCost: deliveryCost,
         subtotal: subtotal,
         total: total,
         status: 'pending'
@@ -2501,7 +2505,7 @@ function saveOrder(orderNumber, name, phone, email, address, total, subtotal) {
     orders.push(order);
     localStorage.setItem('orders', JSON.stringify(orders));
     
-    // Envoyer à Firebase (si en ligne)
+    // Envoyer à Firebase (si en ligne) - seulement pour le suivi admin
     if (navigator.onLine) {
         try {
             db.collection('orders').add(order);
@@ -2518,6 +2522,247 @@ function saveOrder(orderNumber, name, phone, email, address, total, subtotal) {
     cart = [];
     localStorage.setItem('cart', JSON.stringify(cart));
     updateCartCount();
+    
+    // Afficher la facture
+    showFacture(order);
+} 
+
+
+
+// Afficher l'historique des commandes
+function renderOrderHistory() {
+    const historyContainer = document.querySelector('.order-history');
+    
+    // Vérifier si l'historique existe déjà
+    if (!document.getElementById('order-history-list')) {
+        historyContainer.innerHTML = `
+            <h3>Historique des commandes</h3>
+            <div id="order-history-list" class="order-history-list">
+                <!-- Commandes ajoutées dynamiquement -->
+            </div>
+        `;
+        
+        // Charger et afficher les commandes
+        loadAndDisplayOrders();
+    }
+}
+
+// Charger et afficher les commandes
+function loadAndDisplayOrders() {
+    const ordersList = document.getElementById('order-history-list');
+    const savedOrders = localStorage.getItem('orders');
+    
+    if (savedOrders) {
+        orders = JSON.parse(savedOrders);
+        
+        if (orders.length === 0) {
+            ordersList.innerHTML = '<p class="no-orders">Aucune commande dans l\'historique</p>';
+            return;
+        }
+        
+        // Trier les commandes par date (du plus récent au plus ancien)
+        orders.sort((a, b) => new Date(b.date) - new Date(a.date));
+        
+        // Afficher les commandes
+        ordersList.innerHTML = '';
+        orders.forEach(order => {
+            const orderElement = createOrderHistoryItem(order);
+            ordersList.appendChild(orderElement);
+        });
+    } else {
+        ordersList.innerHTML = '<p class="no-orders">Aucune commande dans l\'historique</p>';
+    }
+}
+
+// Créer un élément d'historique de commande
+function createOrderHistoryItem(order) {
+    const orderDate = new Date(order.date);
+    const formattedDate = orderDate.toLocaleDateString('fr-FR');
+    const formattedTime = orderDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    
+    const orderItem = document.createElement('div');
+    orderItem.className = 'order-history-item';
+    orderItem.innerHTML = `
+        <div class="order-history-header">
+            <span class="order-number">${order.id}</span>
+            <span class="order-date">${formattedDate} à ${formattedTime}</span>
+        </div>
+        <div class="order-history-details">
+            <div class="order-status ${order.status}">
+                <i class="fas ${order.status === 'completed' ? 'fa-check-circle' : 
+                              order.status === 'rejected' ? 'fa-times-circle' : 'fa-clock'}"></i>
+                ${order.status === 'completed' ? 'Validée' : 
+                 order.status === 'rejected' ? 'Rejetée' : 'En attente'}
+            </div>
+            <div class="order-total">Total: ${formatPrice(order.total)} FCFA</div>
+            <div class="order-items-count">${order.items.length} article(s)</div>
+        </div>
+        <button class="view-order-details" data-order-id="${order.id}">
+            <i class="fas fa-eye"></i> Voir les détails
+        </button>
+    `;
+    
+    // Ajouter l'écouteur d'événements pour voir les détails
+    orderItem.querySelector('.view-order-details').addEventListener('click', () => {
+        showOrderDetails(order);
+    });
+    
+    return orderItem;
+}
+
+// Afficher les détails d'une commande
+function showOrderDetails(order) {
+    // Créer une modal pour afficher les détails
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.innerHTML = `
+        <div class="modal-content order-details-modal">
+            <button class="close-modal">&times;</button>
+            <h2>Détails de la commande ${order.id}</h2>
+            
+            <div class="order-details-section">
+                <h3>Informations client</h3>
+                <div class="order-details-info">
+                    <p><strong>Nom:</strong> ${order.customerName || 'Non spécifié'}</p>
+                    <p><strong>Téléphone:</strong> ${order.customerPhone}</p>
+                    ${order.customerEmail ? `<p><strong>Email:</strong> ${order.customerEmail}</p>` : ''}
+                    ${order.customerAddress ? `<p><strong>Adresse:</strong> ${order.customerAddress}</p>` : ''}
+                    <p><strong>Livraison:</strong> ${order.deliveryOption}</p>
+                </div>
+            </div>
+            
+            <div class="order-details-section">
+                <h3>Articles commandés</h3>
+                <div class="order-details-items">
+                    ${order.items.map(item => `
+                        <div class="order-details-item">
+                            <img src="${item.product.images[0]}" alt="${item.product.name}">
+                            <div class="order-item-info">
+                                <h4>${item.product.name}</h4>
+                                <p>${formatPrice(item.product.salePrice || item.product.normalPrice)} FCFA × ${item.quantity}</p>
+                            </div>
+                            <div class="order-item-total">
+                                ${formatPrice((item.product.salePrice || item.product.normalPrice) * item.quantity)} FCFA
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            
+            <div class="order-details-summary">
+                <div class="summary-line">
+                    <span>Sous-total:</span>
+                    <span>${formatPrice(order.subtotal)} FCFA</span>
+                </div>
+                ${order.deliveryCost > 0 ? `
+                <div class="summary-line">
+                    <span>Frais de livraison:</span>
+                    <span>${formatPrice(order.deliveryCost)} FCFA</span>
+                </div>
+                ` : ''}
+                <div class="summary-line total">
+                    <span>Total:</span>
+                    <span>${formatPrice(order.total)} FCFA</span>
+                </div>
+            </div>
+            
+            <div class="order-details-actions">
+                <button class="download-receipt-btn" data-order-id="${order.id}">
+                    <i class="fas fa-download"></i> Télécharger le reçu
+                </button>
+            </div>
+        </div>
+    `;
+    
+    // Ajouter la modal au document
+    document.body.appendChild(modal);
+    modal.classList.add('show');
+    
+    // Écouteurs d'événements
+    modal.querySelector('.close-modal').addEventListener('click', () => {
+        document.body.removeChild(modal);
+    });
+    
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            document.body.removeChild(modal);
+        }
+    });
+    
+    // Télécharger le reçu
+    modal.querySelector('.download-receipt-btn').addEventListener('click', () => {
+        generateReceiptPDF(order);
+    });
+}
+
+// Générer un reçu PDF pour une commande
+function generateReceiptPDF(order) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    
+    // En-tête
+    doc.setFontSize(20);
+    doc.setTextColor(20, 40, 160);
+    doc.text('SOUHAIBOU TÉLÉCOM', pageWidth / 2, 20, { align: 'center' });
+    doc.setFontSize(12);
+    doc.setTextColor(100, 100, 100);
+    doc.text('Reçu de commande', pageWidth / 2, 28, { align: 'center' });
+    
+    // Informations de la commande
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`N° de commande: ${order.id}`, 20, 40);
+    doc.text(`Date: ${new Date(order.date).toLocaleDateString('fr-FR')}`, 20, 46);
+    doc.text(`Statut: ${order.status === 'completed' ? 'Validée' : order.status === 'rejected' ? 'Rejetée' : 'En attente'}`, 20, 52);
+    
+    // Informations client
+    doc.text(`Client: ${order.customerName || 'Non spécifié'}`, 20, 62);
+    doc.text(`Téléphone: ${order.customerPhone}`, 20, 68);
+    
+    if (order.customerEmail) {
+        doc.text(`Email: ${order.customerEmail}`, 20, 74);
+    }
+    
+    // Articles
+    let yPosition = 90;
+    doc.setFontSize(12);
+    doc.setTextColor(20, 40, 160);
+    doc.text('Articles commandés', 20, yPosition);
+    yPosition += 10;
+    
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    order.items.forEach(item => {
+        if (yPosition > 250) {
+            doc.addPage();
+            yPosition = 20;
+        }
+        
+        const price = item.product.salePrice || item.product.normalPrice;
+        const totalPrice = price * item.quantity;
+        
+        doc.text(`${item.quantity}x ${item.product.name}`, 20, yPosition);
+        doc.text(`${formatPrice(totalPrice)} FCFA`, pageWidth - 20, yPosition, { align: 'right' });
+        yPosition += 6;
+    });
+    
+    // Total
+    yPosition += 10;
+    doc.setFontSize(12);
+    doc.setTextColor(20, 40, 160);
+    doc.text('Total:', 20, yPosition);
+    doc.text(`${formatPrice(order.total)} FCFA`, pageWidth - 20, yPosition, { align: 'right' });
+    
+    // Pied de page
+    yPosition = 270;
+    doc.setFontSize(8);
+    doc.setTextColor(100, 100, 100);
+    doc.text('Merci pour votre confiance!', pageWidth / 2, yPosition, { align: 'center' });
+    doc.text('Service Client: +221 77 123 45 67', pageWidth / 2, yPosition + 5, { align: 'center' });
+    
+    // Sauvegarder le PDF
+    doc.save(`Reçu_${order.id}.pdf`);
 }
 // Fonction pour sauvegarder la commande
 function saveOrder(orderNumber, name, phone, email, address, deliveryOption, deliveryCost, total, subtotal) {
