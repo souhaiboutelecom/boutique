@@ -2212,19 +2212,22 @@ function processOrder() {
     });
     
     // Calculer les frais de livraison
-    let deliveryCost = 0;
-    let deliveryName = "Récupération sur place";
-    
-    // Vérifier si tous les produits ont la livraison gratuite
-    const allFreeDelivery = cart.every(item => item.product.delivery === 'free');
-    
-    if (deliveryOption !== "pickup" && !allFreeDelivery) {
-        const selectedDelivery = deliveryOptions.find(option => option.id === deliveryOption);
-        if (selectedDelivery) {
-            deliveryCost = selectedDelivery.price;
-            deliveryName = selectedDelivery.name;
-        }
+   // Calculer les frais de livraison
+let deliveryCost = 0;
+let deliveryName = "Récupération sur place";
+
+// Vérifier si l'option de livraison est valide et n'est pas "pickup"
+if (deliveryOption && deliveryOption !== "pickup") {
+    const selectedDelivery = deliveryOptions.find(option => option.id === deliveryOption);
+    if (selectedDelivery) {
+        deliveryCost = selectedDelivery.price;
+        deliveryName = selectedDelivery.name;
+    } else {
+        // Si l'option n'est pas trouvée, utiliser la valeur brute
+        deliveryCost = parseInt(deliveryOption) || 0;
+        deliveryName = "Livraison";
     }
+}
     
     // Calculer le total final
     const total = subtotal + deliveryCost;
@@ -2266,32 +2269,33 @@ function processOrder() {
     });
     
     // Afficher le récapitulatif des prix (version simplifiée)
-    const factureTotal = document.getElementById('facture-total');
-    factureTotal.innerHTML = `
-        <div class="facture-summary">
-            <div class="summary-row">
-                <span>Sous-total (${cart.reduce((acc, item) => acc + item.quantity, 0)} articles):</span>
-                <span>${formatPrice(subtotal)} FCFA</span>
-            </div>
-            ${savings > 0 ? `
-            <div class="summary-row discount">
-                <span>Économies:</span>
-                <span>-${formatPrice(savings)} FCFA</span>
-            </div>
-            ` : ''}
-            <div class="summary-row">
-                <span>Frais de livraison:</span>
-                <span>${deliveryCost > 0 ? formatPrice(deliveryCost) + ' FCFA (' + deliveryName + ')' : 'Gratuit'}</span>
-            </div>
-            <div class="summary-row total">
-                <span><strong>Total:</strong></span>
-                <span><strong>${formatPrice(total)} FCFA</strong></span>
-            </div>
+   // Afficher le récapitulatif des prix (version simplifiée)
+const factureTotal = document.getElementById('facture-total');
+factureTotal.innerHTML = `
+    <div class="facture-summary">
+        <div class="summary-row">
+            <span>Sous-total (${cart.reduce((acc, item) => acc + item.quantity, 0)} articles):</span>
+            <span>${formatPrice(subtotal)} FCFA</span>
         </div>
-        <div class="payment-info">
-            <p>Mode de paiement: Paiement à la livraison</p>
+        ${savings > 0 ? `
+        <div class="summary-row discount">
+            <span>Économies:</span>
+            <span>-${formatPrice(savings)} FCFA</span>
         </div>
-    `;
+        ` : ''}
+        <div class="summary-row">
+            <span>Frais de livraison (${deliveryName}):</span>
+            <span>${deliveryCost > 0 ? formatPrice(deliveryCost) + ' FCFA' : 'Gratuit'}</span>
+        </div>
+        <div class="summary-row total">
+            <span><strong>Total:</strong></span>
+            <span><strong>${formatPrice(total)} FCFA</strong></span>
+        </div>
+    </div>
+    <div class="payment-info">
+        <p>Mode de paiement: Paiement à la livraison</p>
+    </div>
+`;
     
     // Fermer le modal de commande
     document.getElementById('checkout-modal').classList.add('hidden');
