@@ -1906,3 +1906,292 @@ body {
 .hidden {
     display: none !important;
 }
+
+.facture-summary {
+    border-top: 2px solid #eee;
+    padding-top: 15px;
+    margin-top: 15px;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+.summary-row.discount {
+    color: #28a745;
+    font-weight: 500;
+}
+
+.summary-row.total {
+    border-top: 1px solid #ddd;
+    padding-top: 10px;
+    margin-top: 10px;
+    font-size: 1.1rem;
+}
+
+.discount-badge {
+    background: #28a745;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    margin-top: 5px;
+    display: inline-block;
+}
+
+/* Styles pour la facture */
+.facture-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.facture-modal:not(.hidden) {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.facture-content {
+    background: white;
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 10px;
+    padding: 20px;
+    position: relative;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+}
+
+.close-facture {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #ff4444;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.facture-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #1428A0;
+    padding-bottom: 15px;
+}
+
+.facture-logo {
+    width: 60px;
+    height: 60px;
+    margin-right: 15px;
+    border-radius: 5px;
+    object-fit: cover;
+}
+
+.facture-title h2 {
+    color: #1428A0;
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.facture-title p {
+    margin: 5px 0 0;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.facture-info {
+    margin-bottom: 20px;
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+.facture-info p {
+    margin: 5px 0;
+    font-size: 0.9rem;
+}
+
+.facture-info strong {
+    color: #1428A0;
+}
+
+.facture-items {
+    margin: 20px 0;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+    padding: 15px 0;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.facture-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px dashed #eee;
+}
+
+.facture-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.facture-item-image {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 5px;
+    margin-right: 15px;
+    border: 1px solid #eee;
+}
+
+.facture-item-details {
+    flex: 1;
+}
+
+.facture-item-name {
+    margin: 0 0 5px 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.facture-item-price {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.facture-item-total {
+    margin: 5px 0 0 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1428A0;
+}
+
+.facture-item-savings {
+    margin: 3px 0 0 0;
+    font-size: 0.85rem;
+    color: #28a745;
+    font-weight: 500;
+}
+
+.facture-summary {
+    border-top: 2px solid #eee;
+    padding-top: 15px;
+    margin-top: 15px;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+.summary-row.discount {
+    color: #28a745;
+    font-weight: 500;
+}
+
+.summary-row.total {
+    border-top: 1px solid #ddd;
+    padding-top: 10px;
+    margin-top: 10px;
+    font-size: 1.1rem;
+}
+
+.payment-info {
+    margin-top: 15px;
+    padding: 10px;
+    background: #f0f8ff;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.facture-footer {
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+    color: #666;
+    font-size: 0.85rem;
+}
+
+.download-facture-btn {
+    background: #1428A0;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 5px;
+    margin-top: 15px;
+    cursor: pointer;
+    font-weight: 500;
+    width: 100%;
+    transition: background 0.3s;
+}
+
+.download-facture-btn:hover {
+    background: #0d1c6e;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Animation d'apparition */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.facture-content {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+/* Barre de défilement personnalisée */
+.facture-items::-webkit-scrollbar {
+    width: 6px;
+}
+
+.facture-items::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.facture-items::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 10px;
+}
+
+.facture-items::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
