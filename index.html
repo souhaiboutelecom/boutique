@@ -489,38 +489,114 @@
 
         <!-- Facture -->
      <!-- Ajoutez ceci dans votre HTML, de préférence à la fin du body -->
-<!-- Ce code doit être dans votre HTML principal, pas dans une nouvelle page -->
 <div id="facture-modal" class="facture-modal hidden">
     <div class="facture-content">
         <button class="close-facture">&times;</button>
+        
+        <!-- En-tête élégante -->
         <div class="facture-header">
-            <img src="https://i.supaimg.com/b4a44dc2-c78a-45ff-a93b-dd14e4249939.jpg" alt="Logo" class="facture-logo">
-            <div class="facture-title">
-                <h2>SOUHAIBOU TÉLÉCOM</h2>
-                <p>Vente tous appareil Apple et accessoires</p>
+            <div class="facture-logo-container">
+                <img src="https://i.supaimg.com/b4a44dc2-c78a-45ff-a93b-dd14e4249939.jpg" alt="SOUHAIBOU TÉLÉCOM" class="facture-logo">
+                <div class="facture-brand">
+                    <h1>SOUHAIBOU TÉLÉCOM</h1>
+                    <p class="facture-subtitle">Excellence en Électronique & Accessoires</p>
+                </div>
+            </div>
+            <div class="facture-badge">
+                <span>Commande confirmée</span>
             </div>
         </div>
-        
-        <div class="facture-info">
-            <p><strong>Commande N°:</strong> <span id="facture-number"></span></p>
-            <p><strong>Client:</strong> <span id="facture-client"></span></p>
-            <p><strong>Téléphone:</strong> <span id="facture-phone"></span></p>
-            <p><strong>Email:</strong> <span id="facture-email"></span></p>
-            <p><strong>Adresse:</strong> <span id="facture-address"></span></p>
-            <p><strong>Date et heure:</strong> <span id="facture-date"></span></p>
+
+        <!-- Informations client -->
+        <div class="facture-client-info">
+            <div class="info-section">
+                <h3>Informations Client</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Commande N°:</span>
+                        <span class="info-value" id="facture-number">ST000001</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Date:</span>
+                        <span class="info-value" id="facture-date">01/01/2024 14:30</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Client:</span>
+                        <span class="info-value" id="facture-client">John Doe</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Téléphone:</span>
+                        <span class="info-value" id="facture-phone">+221 77 123 45 67</span>
+                    </div>
+                    <div class="info-item full-width">
+                        <span class="info-label">Email:</span>
+                        <span class="info-value" id="facture-email">client@email.com</span>
+                    </div>
+                    <div class="info-item full-width">
+                        <span class="info-label">Adresse:</span>
+                        <span class="info-value" id="facture-address">123 Avenue Lamine Guèye, Dakar</span>
+                    </div>
+                </div>
+            </div>
         </div>
-        
-        <div class="facture-items" id="facture-items">
-            <!-- Les articles seront ajoutés ici dynamiquement -->
+
+        <!-- Articles -->
+        <div class="facture-items-section">
+            <h3>Articles Commandés</h3>
+            <div class="facture-items" id="facture-items">
+                <!-- Les articles seront ajoutés dynamiquement -->
+            </div>
         </div>
-        
-        <div class="facture-total" id="facture-total">
-            <!-- Le total sera ajouté ici dynamiquement -->
+
+        <!-- Résumé et Total -->
+        <div class="facture-summary">
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <span>Sous-total:</span>
+                    <span id="facture-subtotal">0 FCFA</span>
+                </div>
+                <div class="summary-item">
+                    <span>Livraison:</span>
+                    <span id="facture-delivery">0 FCFA</span>
+                </div>
+               
+                <div class="summary-item total">
+                    <span>TOTAL:</span>
+                    <span id="facture-total">0 FCFA</span>
+                </div>
+            </div>
         </div>
-        
+
+        <!-- Informations de paiement -->
+        <div class="payment-info">
+            <h3>Informations de Paiement</h3>
+            <div class="payment-methods">
+                <div class="payment-method">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <span>Paiement à la livraison</span>
+                </div>
+                
+            </div>
+        </div>
+
+        <!-- Pied de page -->
         <div class="facture-footer">
-            <p>Faite une capture pour garder cette page.</p>
-            <button class="download-facture-btn" id="download-facture">Télécharger la facture</button>
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Merci pour votre confiance !</h4>
+                    <p>Votre satisfaction est notre priorité</p>
+                </div>
+                <div class="footer-section">
+                    <p><strong>Service Client:</strong> +221 77 123 45 67</p>
+                    <p><strong>Email:</strong> contact@souhaiboutelecom.com</p>
+                </div>
+            </div>
+            <div class="footer-actions">
+                <button class="download-facture-btn" id="download-facture">
+                    <i class="fas fa-download"></i>
+                    Télécharger le PDF
+                </button>
+            </div>
         </div>
     </div>
 </div>
