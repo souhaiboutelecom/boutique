@@ -2,10 +2,10 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <title>SOUAIBOU TÉLÉCOM - Vente tous appareil Apple et accessoires</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -13,250 +13,562 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 </head>
 <body>
-    <!-- Navigation supérieure -->
-    <header class="header">
-        <div class="header-content">
+    <!-- Page de chargement -->
+ 
+    <!-- Indicateur de connexion -->
+    <div id="connection-status" class="offline">
+        <i class="fas fa-wifi-slash"></i> Pas de connexion Internet
+    </div>
+
+    <!-- En-tête avec barre de recherche -->
+    <header id="main-header">
+        <div class="header-top">
             <div class="logo-container">
                 <img src="https://i.supaimg.com/b4a44dc2-c78a-45ff-a93b-dd14e4249939.jpg" alt="SOUAIBOU TÉLÉCOM" class="logo">
-                <div class="logo-text">
+                <div class="brand-text">
                     <h1>SOUAIBOU TÉLÉCOM</h1>
                     <p>Vente tous appareil Apple et accessoires</p>
                 </div>
             </div>
             <div class="search-container">
-                <input type="text" id="searchInput" placeholder="Rechercher un produit...">
-                <button id="searchBtn"><i class="fas fa-search"></i></button>
-                <div id="adminPasswordContainer" class="hidden">
-                    <input type="password" id="adminPasswordInput" placeholder="Mot de passe admin">
-                    <button id="adminLoginBtn"><i class="fas fa-lock"></i></button>
-                </div>
+                <input type="text" id="search-input" placeholder="Rechercher un produit...">
+                <button id="search-btn"><i class="fas fa-search"></i></button>
             </div>
-            <div class="cart-icon-container">
-                <button id="cartBtn">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span id="cartCount">0</span>
-                </button>
+            <!-- Champ de mot de passe admin caché -->
+            <div id="admin-password-container" class="hidden">
+                <input type="password" id="admin-password-input" placeholder="Mot de passe admin">
+                <button id="admin-login-btn">Connexion</button>
             </div>
         </div>
     </header>
 
-    <!-- Navigation des catégories -->
-    <nav class="categories-nav">
-        <div class="categories-container">
-            <button class="category-btn" data-category="all">Tous</button>
-            <button class="category-btn" data-category="iPhone">iPhone</button>
-            <button class="category-btn" data-category="Samsung">Samsung</button>
-            <button class="category-btn" data-category="Tecno">Tecno</button>
-            <button class="category-btn" data-category="Autres marques">Autres marques</button>
-            <button class="category-btn" data-category="AirPods">AirPods</button>
-            <button class="category-btn" data-category="Chargeur">Chargeur</button>
-            <button class="category-btn" data-category="Ecouteur">Ecouteur</button>
-            <button class="category-btn" data-category="Power Bank">Power Bank</button>
-            <button class="category-btn" data-category="Tablette">Tablette</button>
-            <button class="category-btn" data-category="Box">Box</button>
-            <button class="category-btn" data-category="Smart Watch">Smart Watch</button>
-            <button class="category-btn" data-category="Autre">Autre</button>
-        </div>
-    </nav>
-
-    <!-- Contenu principal -->
-    <main class="main-content">
+    <!-- Conteneur principal pour les vues -->
+    <main id="app-container">
         <!-- Page d'accueil -->
-        <section id="homePage" class="page active">
-            <div class="featured-products">
-                <h2>Produits en vedette</h2>
-                <div id="featuredProducts" class="products-grid"></div>
+        <section id="home-page" class="page active">
+            <div class="carousel-container">
+                <div class="carousel">
+                    <div class="carousel-inner">
+                        <!-- Les images du carrousel seront ajoutées dynamiquement -->
+                    </div>
+                    <div class="carousel-dots">
+                        <!-- Les points de navigation seront ajoutés dynamiquement -->
+                    </div>
+                </div>
             </div>
-            
-            <div class="all-products">
-                <h2>Tous nos produits</h2>
-                <div id="allProducts" class="products-grid"></div>
+
+            <!-- Section iPhone -->
+            <div class="category-bar blue">
+                <div class="bar-content">
+                    <div class="bar-title">
+                        <i class="fab fa-apple"></i>
+                        <h2>IPHONE</h2>
+                        <p>Meilleures offres</p>
+                    </div>
+                    <a href="#" class="see-more" data-category="iPhone">Voir plus <i class="fas fa-chevron-right"></i></a>
+                </div>
             </div>
-            
-            <div id="pagination" class="pagination"></div>
+            <div class="products-scroll" id="iphone-products">
+                <!-- Produits iPhone ajoutés dynamiquement -->
+            </div>
+
+            <!-- Section Vente Flash -->
+            <div class="category-bar red">
+                <div class="bar-content">
+                    <div class="bar-title">
+                        <i class="fas fa-bolt"></i>
+                        <h2>Vente FLASH</h2>
+                        <p>Termine dans: <span id="countdown">12:00:00</span></p>
+                    </div>
+                    <a href="#" class="see-more" data-category="flash">Voir plus <i class="fas fa-chevron-right"></i></a>
+                </div>
+            </div>
+            <div class="products-scroll" id="flash-products">
+                <!-- Produits en vente flash ajoutés dynamiquement -->
+            </div>
+
+            <!-- Section Catégories -->
+            <div class="category-bar light-blue">
+                <div class="bar-content">
+                    <h2>CATÉGORIES</h2>
+                </div>
+            </div>
+            <div class="categories-grid" id="categories-container">
+                <!-- Catégories ajoutées dynamiquement -->
+            </div>
+
+            <!-- Section Recommandé pour vous -->
+            <h3 class="section-title">RECOMMANDÉ POUR VOUS</h3>
+            <div class="products-scroll" id="recommended-products">
+                <!-- Produits recommandés ajoutés dynamiquement -->
+            </div>
+
+            <!-- Sections de catégories dynamiques -->
+            <div id="dynamic-categories">
+                <!-- Sections de catégories ajoutées dynamiquement -->
+            </div>
+        </section>
+
+        <!-- Page de catégorie -->
+        <section id="category-page" class="page">
+            <div class="page-header">
+                <button class="back-btn"><i class="fas fa-arrow-left"></i></button>
+                <h2 id="category-title">Nom de la catégorie</h2>
+            </div>
+            <div class="products-grid" id="category-products">
+                <!-- Produits de la catégorie ajoutés dynamiquement -->
+            </div>
         </section>
 
         <!-- Page de détails produit -->
-        <section id="productPage" class="page">
-            <button id="backToHome" class="back-btn"><i class="fas fa-arrow-left"></i> Retour</button>
-            <div id="productDetails" class="product-details"></div>
+        <section id="product-page" class="page">
+            <div class="page-header">
+                <button class="back-btn"><i class="fas fa-arrow-left"></i></button>
+                <h2>Détails du produit</h2>
+            </div>
+            <div class="product-detail">
+                <div class="product-image-carousel">
+                    <div class="carousel-inner">
+                        <!-- Images du produit ajoutées dynamiquement -->
+                    </div>
+                    <div class="carousel-dots">
+                        <!-- Points de navigation ajoutés dynamiquement -->
+                    </div>
+                </div>
+                <div class="product-info">
+                    <h1 id="product-name">Nom du produit</h1>
+                    <p class="product-brand" id="product-brand">Marque</p>
+                    <div class="product-pricing">
+                        <span class="current-price" id="product-price">0 FCFA</span>
+                        <span class="original-price" id="product-original-price">0 FCFA</span>
+                        <span class="discount" id="product-discount">0%</span>
+                    </div>
+                    <p class="delivery-info" id="product-delivery">Livraison gratuite</p>
+                    <div class="product-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <div class="product-actions">
+                        <div class="quantity-selector">
+                            <button class="quantity-btn minus">-</button>
+                            <span class="quantity">1</span>
+                            <button class="quantity-btn plus">+</button>
+                        </div>
+                        <button class="add-to-cart-btn">Ajouter au panier</button>
+                        <button class="favorite-btn"><i class="far fa-heart"></i></button>
+                    </div>
+                    <div class="product-specs">
+                        <h3>Caractéristiques</h3>
+                        <div class="specs-list" id="product-specs">
+                            <!-- Caractéristiques ajoutées dynamiquement -->
+                        </div>
+                    </div>
+                    <div class="product-details">
+                        <h3>Détails</h3>
+                        <p id="product-description">Description du produit</p>
+                    </div>
+                </div>
+            </div>
             <div class="related-products">
-                <h3>Vous aimerez aussi</h3>
-                <div id="relatedProducts" class="products-grid"></div>
+                <h3>Vous pourriez aussi aimer</h3>
+                <div class="products-grid" id="related-products">
+                    <!-- Produits similaires ajoutés dynamiquement -->
+                </div>
             </div>
         </section>
 
-        <!-- Page panier -->
-        <section id="cartPage" class="page">
-            <h2>Votre Panier</h2>
-            <div id="cartItems" class="cart-items"></div>
-            <div class="cart-summary">
+        <!-- Page Panier -->
+        <section id="cart-page" class="page">
+            <div class="page-header">
+                <button class="back-btn"><i class="fas fa-arrow-left"></i></button>
+                <h2>Votre panier</h2>
+            </div>
+            <div class="cart-content">
+                <div class="delivery-notice">
+                    <i class="fas fa-truck"></i> LIVRAISON EN 24H.
+                </div>
+                <div id="empty-cart" class="empty-cart">
+                    <i class="fas fa-shopping-cart"></i>
+                    <p>Votre panier est vide</p>
+                </div>
+                <div id="cart-items" class="hidden">
+                    <!-- Articles du panier ajoutés dynamiquement -->
+                </div>
                 <div class="delivery-options">
                     <h3>Options de livraison</h3>
-                    <select id="deliveryOption">
-                        <option value="">Sélectionnez une option</option>
+                    <select id="delivery-zone">
+                        <option value="pickup">Récupérer par moi-même (Gratuit)</option>
+                        <!-- Options de livraison ajoutées dynamiquement -->
                     </select>
                 </div>
-                <div class="cart-totals">
-                    <p>Sous-total: <span id="subtotal">0 FCFA</span></p>
-                    <p>Livraison: <span id="deliveryCost">0 FCFA</span></p>
-                    <p class="total">Total: <span id="total">0 FCFA</span></p>
-                    <button id="checkoutBtn" class="checkout-btn">Commander</button>
+                <div class="cart-summary">
+                    <div class="summary-line">
+                        <span>Sous-total:</span>
+                        <span id="subtotal">0 FCFA</span>
+                    </div>
+                    <div class="summary-line original">
+                        <span>Prix normal:</span>
+                        <span id="original-total">0 FCFA</span>
+                    </div>
+                    <div class="summary-line savings">
+                        <span>Économies:</span>
+                        <span id="savings">0 FCFA (0%)</span>
+                    </div>
+                    <div class="summary-line total">
+                        <span>Total:</span>
+                        <span id="total-price">0 FCFA</span>
+                    </div>
+                    <button id="checkout-btn" class="checkout-btn">Valider ma commande</button>
+                </div>
+                <div class="order-history">
+                    <h3>Historique des commandes</h3>
+                    <button id="view-history-btn">Voir</button>
                 </div>
             </div>
         </section>
 
-        <!-- Modal de commande -->
-        <div id="checkoutModal" class="modal">
-            <div class="modal-content">
-                <span class="close-modal">&times;</span>
-                <h2>Finaliser votre commande</h2>
-                <form id="checkoutForm">
-                    <div class="form-group">
-                        <label for="firstName">Prénom</label>
-                        <input type="text" id="firstName">
-                    </div>
-                    <div class="form-group">
-                        <label for="lastName">Nom</label>
-                        <input type="text" id="lastName">
-                    </div>
-                    <div class="form-group">
-                        <label for="phone">Téléphone <span class="required">*</span></label>
-                        <input type="tel" id="phone" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" id="email">
-                    </div>
-                    <div class="order-summary">
-                        <h3>Récapitulatif de commande</h3>
-                        <div id="orderSummary"></div>
-                        <p class="delivery-notice">VOTRE COLIS SERA LIVRÉ DANS MAXIMUM 24H.</p>
-                    </div>
-                    <button type="submit" class="submit-order-btn">Confirmer la commande</button>
-                </form>
+        <!-- Page Favoris -->
+        <section id="favorites-page" class="page">
+            <div class="page-header">
+                <button class="back-btn"><i class="fas fa-arrow-left"></i></button>
+                <h2>Mes favoris</h2>
             </div>
-        </div>
+            <div class="favorites-content">
+                <div id="empty-favorites" class="empty-state">
+                    <i class="far fa-heart"></i>
+                    <p>Aucun produit en favoris</p>
+                </div>
+                <div class="products-grid" id="favorites-list">
+                    <!-- Produits favoris ajoutés dynamiquement -->
+                </div>
+            </div>
+        </section>
 
-        <!-- Page contact -->
-        <section id="contactPage" class="page">
-            <h2>Contactez-nous</h2>
-            <div class="contact-info">
-                <div class="contact-item">
-                    <i class="fas fa-phone gold-icon"></i>
-                    <h3>Téléphone</h3>
-                    <p>+221 77 123 45 67</p>
-                    <p>+221 76 987 65 43</p>
-                </div>
-                <div class="contact-item">
-                    <i class="fab fa-whatsapp gold-icon"></i>
-                    <h3>WhatsApp</h3>
-                    <p><a href="https://wa.me/221771234567">Écrivez-nous sur WhatsApp</a></p>
-                </div>
-                <div class="contact-item">
-                    <i class="fas fa-map-marker-alt gold-icon"></i>
-                    <h3>Adresses</h3>
-                    <p class="address" data-address="Dakar Centre">Dakar Centre</p>
-                    <p class="address" data-address="Almadies">Almadies</p>
-                    <p class="address" data-address="Sacre Coeur">Sacre Coeur</p>
-                </div>
-                <div class="contact-item">
-                    <i class="fas fa-clock gold-icon"></i>
-                    <h3>Heures d'ouverture</h3>
-                    <p>Lun - Sam: 8h - 20h</p>
+        <!-- Page Contact -->
+        <section id="contact-page" class="page">
+            <div class="page-header">
+                <button class="back-btn"><i class="fas fa-arrow-left"></i></button>
+                <h2>Contact</h2>
+            </div>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <h3><i class="fas fa-phone"></i> Téléphone</h3>
+                    <p><a href="tel:+221771234567">+221 77 123 45 67</a></p>
+                    <p><a href="tel:+221761234567">+221 76 123 45 67</a></p>
+                    
+                    <h3><i class="fab fa-whatsapp"></i> WhatsApp</h3>
+                    <p><a href="https://wa.me/221771234567" target="_blank">+221 77 123 45 67</a></p>
+                    
+                    <h3><i class="fas fa-map-marker-alt"></i> Adresses</h3>
+                    <div class="address">
+                        <h4>Dakar Centre</h4>
+                        <p>123 Avenue Lamine Guèye</p>
+                        <a href="#" class="map-link" data-address="123 Avenue Lamine Guèye, Dakar">Voir sur la carte</a>
+                    </div>
+                    <div class="address">
+                        <h4>Almadies</h4>
+                        <p>456 Corniche des Almadies</p>
+                        <a href="#" class="map-link" data-address="456 Corniche des Almadies, Dakar">Voir sur la carte</a>
+                    </div>
+                    <div class="address">
+                        <h4>Grand Dakar</h4>
+                        <p>789 Rue 10, Grand Dakar</p>
+                        <a href="#" class="map-link" data-address="789 Rue 10, Grand Dakar, Dakar">Voir sur la carte</a>
+                    </div>
+                    
+                    <h3><i class="fas fa-clock"></i> Horaires d'ouverture</h3>
+                    <p>Lundi - Samedi: 8h - 20h</p>
                     <p>Dimanche: 9h - 13h</p>
                 </div>
             </div>
         </section>
 
-        <!-- Page admin -->
-        <section id="adminPage" class="page">
-            <h2>Tableau de Bord Admin</h2>
-            <div class="admin-nav">
-                <button class="admin-btn" data-view="addProduct">Ajouter un Article</button>
-                <button class="admin-btn" data-view="productList">Liste des Articles</button>
-                <button class="admin-btn" data-view="pendingOrders">Commandes en Attente</button>
-                <button class="admin-btn" data-view="completedOrders">Commandes Validées</button>
-                <button class="admin-btn" data-view="rejectedOrders">Commandes Rejetées</button>
-                <button class="admin-btn" data-view="deliverySettings">Livraison</button>
-                <button class="admin-btn" data-view="adsSettings">Affiches Publicitaires</button>
-                <button id="changePasswordBtn" class="admin-btn"><i class="fas fa-lock"></i> Changer Mot de Passe</button>
+        <!-- Page Admin -->
+        <section id="admin-page" class="page">
+            <div class="page-header">
+                <button class="back-btn"><i class="fas fa-arrow-left"></i></button>
+                <h2>Administration</h2>
             </div>
+            <div class="admin-dashboard">
+                <div class="admin-menu">
+                    <button class="admin-btn" data-view="add-product">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Ajouter un Article</span>
+                    </button>
+                    <button class="admin-btn" data-view="product-list">
+                        <i class="fas fa-list"></i>
+                        <span>Liste des Articles</span>
+                    </button>
+                    <button class="admin-btn" data-view="pending-orders">
+                        <i class="fas fa-clock"></i>
+                        <span>Commandes en Attente</span>
+                    </button>
+                    <button class="admin-btn" data-view="completed-orders">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Commandes Validées</span>
+                    </button>
+                    <button class="admin-btn" data-view="rejected-orders">
+                        <i class="fas fa-times-circle"></i>
+                        <span>Commandes Rejetées</span>
+                    </button>
+                    <button class="admin-btn" data-view="delivery-settings">
+                        <i class="fas fa-truck"></i>
+                        <span>Livraison</span>
+                    </button>
+                    <button class="admin-btn" data-view="ads-settings">
+                        <i class="fas fa-ad"></i>
+                        <span>Publicités</span>
+                    </button>
+                </div>
 
-            <div id="adminContent" class="admin-content">
-                <!-- Le contenu admin sera chargé dynamiquement ici -->
+                <!-- Vue Ajouter un produit -->
+                <div id="add-product-view" class="admin-view hidden">
+                    <h3>Ajouter un nouveau produit</h3>
+                    <form id="add-product-form">
+                        <div class="form-group">
+                            <label for="product-name">Nom du produit</label>
+                            <input type="text" id="product-name-input" name="name">
+                        </div>
+                        <div class="form-group">
+                            <label for="product-brand">Marque</label>
+                            <input type="text" id="product-brand-input" name="brand">
+                        </div>
+                        <div class="form-group">
+                            <label for="product-category">Catégorie</label>
+                            <select id="product-category-input" name="category">
+                                <option value="iPhone">iPhone</option>
+                                <option value="Samsung">Samsung</option>
+                                <option value="Tecno">Tecno</option>
+                                <option value="Autres marques">Autres marques</option>
+                                <option value="Ecouteur">Écouteur</option>
+                                <option value="AirPods">AirPods</option>
+                                <option value="Chargeur">Chargeur</option>
+                                <option value="Power Bank">Power Bank</option>
+                                <option value="Tablette">Tablette</option>
+                                <option value="ordinateur">Ordinateur</option>
+                                <option value="Box">Box</option>
+                                <option value="Smart Watch">Smart Watch</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="product-normal-price">Prix normal (FCFA)</label>
+                            <input type="number" id="product-normal-price-input" name="normalPrice" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="product-sale-price">Prix réduit (FCFA)</label>
+                            <input type="number" id="product-sale-price-input" name="salePrice" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="product-discount">Pourcentage de réduction (%)</label>
+                            <input type="number" id="product-discount-input" name="discount" min="0" max="100">
+                        </div>
+                        <div class="form-group">
+                            <label for="product-stock">Stock initial</label>
+                            <input type="number" id="product-stock-input" name="stock" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="product-delivery">Livraison</label>
+                            <select id="product-delivery-input" name="delivery">
+                                <option value="free">Gratuite</option>
+                                <option value="paid">Payante</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Flash Sale</label>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="product-flash-sale-input" name="flashSale">
+                                <label for="product-flash-sale-input">Inclure dans les ventes flash</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Caractéristiques</label>
+                            <div class="specs-inputs">
+                                <input type="text" placeholder="OS" name="spec-os">
+                                <input type="text" placeholder="Stockage" name="spec-storage">
+                                <input type="text" placeholder="RAM" name="spec-ram">
+                                <input type="text" placeholder="Taille écran" name="spec-screen">
+                                <input type="text" placeholder="Modèle" name="spec-model">
+                                <input type="text" placeholder="Technologie" name="spec-tech">
+                                <input type="text" placeholder="Couleurs" name="spec-colors">
+                                <input type="text" placeholder="Batterie" name="spec-battery">
+                                <input type="text" placeholder="Caméra" name="spec-camera">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="product-description-input">Description du produit</label>
+                            <textarea id="product-description-input" name="description" rows="4"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="product-main-image">Image principale (URL)</label>
+                            <input type="url" id="product-main-image-input" name="mainImage" placeholder="https://...">
+                            <div class="image-preview" id="main-image-preview"></div>
+                        </div>
+                        <div class="form-group">
+                            <label>Images supplémentaires (URLs)</label>
+                            <div id="additional-images-container">
+                                <div class="image-input-group">
+                                    <input type="url" class="additional-image-input" name="additionalImages" placeholder="https://...">
+                                    <div class="image-preview additional-preview"></div>
+                                </div>
+                            </div>
+                            <button type="button" id="add-image-btn" class="secondary-btn">+ Ajouter une image</button>
+                        </div>
+                        <button type="submit" class="submit-btn">Ajouter le produit</button>
+                    </form>
+                </div>
+<!-- Vue Liste des produits -->
+<div id="product-list-view" class="admin-view hidden">
+    <!-- Le contenu sera généré dynamiquement -->
+</div>
+
+<!-- Vue Commandes en attente -->
+<div id="pending-orders-view" class="admin-view hidden">
+    <!-- Le contenu sera généré dynamiquement -->
+</div>
+
+<!-- Vue Commandes validées -->
+<div id="completed-orders-view" class="admin-view hidden">
+    <!-- Le contenu sera généré dynamiquement -->
+</div>
+
+<!-- Vue Commandes rejetées -->
+<div id="rejected-orders-view" class="admin-view hidden">
+    <!-- Le contenu sera généré dynamiquement -->
+</div>
+
+<!-- Vue Paramètres de livraison -->
+<div id="delivery-settings-view" class="admin-view hidden">
+    <!-- Le contenu sera généré dynamiquement -->
+</div>
+
+<!-- Vue Paramètres des publicités -->
+<div id="ads-settings-view" class="admin-view hidden">
+    <!-- Le contenu sera généré dynamiquement -->
+</div>
+                <!-- Autres vues admin seront ajoutées dynamiquement -->
             </div>
         </section>
 
-        <!-- Modal d'image plein écran -->
-        <div id="imageModal" class="modal">
-            <span class="close-modal">&times;</span>
-            <img class="modal-content" id="fullSizeImage">
-        </div>
-
-        <!-- Modal de notification -->
-        <div id="notificationModal" class="modal notification">
+        <!-- Formulaire de commande -->
+        <div id="checkout-modal" class="modal hidden">
             <div class="modal-content">
-                <span class="close-modal">&times;</span>
-                <p id="notificationMessage"></p>
+                <button class="close-modal">&times;</button>
+                <h2>Finaliser votre commande</h2>
+                <form id="checkout-form">
+                    <div class="form-group">
+                        <label for="customer-name">Nom complet</label>
+                        <input type="text" id="customer-name" name="name">
+                    </div>
+                    <div class="form-group">
+                        <label for="customer-phone">Numéro de téléphone *</label>
+                        <input type="tel" id="customer-phone" name="phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="customer-email">Email</label>
+                        <input type="email" id="customer-email" name="email">
+                    </div>
+                    <div class="form-group">
+                        <label for="customer-address">Adresse</label>
+                        <textarea id="customer-address" name="address" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">Confirmer la commande</button>
+                </form>
             </div>
         </div>
 
-        <!-- Modal de confirmation -->
-        <div id="confirmationModal" class="modal">
-            <div class="modal-content">
-                <h3 id="confirmationTitle"></h3>
-                <p id="confirmationMessage"></p>
-                <div class="confirmation-buttons">
-                    <button id="confirmYes" class="confirm-btn">Oui</button>
-                    <button id="confirmNo" class="confirm-btn cancel">Non</button>
+        <!-- Facture -->
+        <div id="invoice-modal" class="modal hidden">
+            <div class="modal-content invoice">
+                <button class="close-modal">&times;</button>
+                <div class="invoice-header">
+                    <img src="https://i.supaimg.com/b4a44dc2-c78a-45ff-a93b-dd14e4249939.jpg" alt="SOUAIBOU TÉLÉCOM" class="invoice-logo">
+                    <div class="invoice-title">
+                        <h2>SOUAIBOU TÉLÉCOM</h2>
+                        <p>Vente tous appareil Apple et accessoires</p>
+                    </div>
+                </div>
+                <div class="invoice-details">
+                    <p><strong>Commande N°:</strong> <span id="invoice-number"></span></p>
+                    <p><strong>Client:</strong> <span id="invoice-customer"></span></p>
+                    <p><strong>Téléphone:</strong> <span id="invoice-phone"></span></p>
+                    <p><strong>Email:</strong> <span id="invoice-email"></span></p>
+                    <p><strong>Adresse:</strong> <span id="invoice-address"></span></p>
+                    <p><strong>Date:</strong> <span id="invoice-date"></span></p>
+                </div>
+                <div class="invoice-items">
+                    <h3>Articles commandés</h3>
+                    <table id="invoice-items-table">
+                        <thead>
+                            <tr>
+                                <th>Produit</th>
+                                <th>Quantité</th>
+                                <th>Prix</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Articles ajoutés dynamiquement -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="invoice-total">
+                    <p><strong>Total TTC:</strong> <span id="invoice-total"></span> FCFA</p>
+                </div>
+                <div class="invoice-footer">
+                    <p>Faites une capture pour garder cette page.</p>
                 </div>
             </div>
         </div>
 
-        <!-- Modal de changement de mot de passe -->
-        <div id="passwordModal" class="modal">
-            <div class="modal-content">
-                <span class="close-modal">&times;</span>
-                <h2>Changer le mot de passe admin</h2>
-                <form id="passwordForm">
-                    <div class="form-group">
-                        <label for="currentPassword">Mot de passe actuel</label>
-                        <input type="password" id="currentPassword" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="newPassword">Nouveau mot de passe</label>
-                        <input type="password" id="newPassword" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="confirmPassword">Confirmer le nouveau mot de passe</label>
-                        <input type="password" id="confirmPassword" required>
-                    </div>
-                    <button type="submit" class="submit-btn">Changer le mot de passe</button>
-                </form>
+        <!-- Modal d'image plein écran -->
+        <div id="image-modal" class="modal hidden">
+            <div class="modal-content image-viewer">
+                <button class="close-modal">&times;</button>
+                <img id="fullscreen-image" src="" alt="Image plein écran">
+            </div>
+        </div>
+
+        <!-- Modal publicitaire -->
+        <div id="ad-modal" class="modal hidden">
+            <div class="modal-content ad">
+                <button class="close-modal">&times;</button>
+                <img id="ad-image" src="" alt="Publicité">
             </div>
         </div>
     </main>
 
     <!-- Navigation inférieure -->
-    <footer class="bottom-nav">
-        <button class="nav-btn active" data-page="homePage">
+    <nav id="bottom-nav">
+        <a href="#" class="nav-item active" data-page="home-page">
             <i class="fas fa-home"></i>
             <span>Accueil</span>
-        </button>
-        <button class="nav-btn" data-page="categoriesPage">
+        </a>
+        <a href="#" class="nav-item" data-page="category-page">
             <i class="fas fa-list"></i>
             <span>Catégories</span>
-        </button>
-        <button class="nav-btn" data-page="cartPage">
+        </a>
+        <a href="#" class="nav-item" data-page="cart-page">
             <i class="fas fa-shopping-cart"></i>
             <span>Panier</span>
-        </button>
-        <button class="nav-btn" data-page="contactPage">
+            <span id="cart-count" class="badge hidden">0</span>
+        </a>
+        <a href="#" class="nav-item" data-page="favorites-page">
+            <i class="fas fa-heart"></i>
+            <span>Favoris</span>
+        </a>
+        <a href="#" class="nav-item" data-page="contact-page">
             <i class="fas fa-phone"></i>
             <span>Contact</span>
-        </button>
-    </footer>
+        </a>
+    </nav>
+
+    <!-- Notifications -->
+    <div id="notification" class="notification hidden">
+        <span id="notification-text"></span>
+    </div>
 
     <script src="script.js"></script>
 </body>
