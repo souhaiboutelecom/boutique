@@ -2203,34 +2203,37 @@ body {
 }
 
  
-/* Ajustement pour afficher les images adjacentes complètes */
+/* Carousel styles */
+/* Bandeau défilant continu sans interruption */
 .carousel-container {
     margin: 5px -15px 10px -15px;
     padding: 0;
     background: transparent;
     border: none;
     box-shadow: none;
+    overflow: hidden;
+    position: relative;
 }
 
 .carousel {
     position: relative;
-    overflow: hidden;
     height: 130px;
     margin: 0;
+    overflow: hidden;
 }
 
 .carousel-inner {
     display: flex;
-    transition: transform 0.5s ease;
     height: 100%;
-    padding: 0; /* Supprimer le padding */
+    width: max-content;
+    animation: infiniteScroll 40s linear infinite;
 }
 
 .carousel-item {
-    min-width: 60%; /* Réduire la largeur pour voir les images voisines */
+    flex: 0 0 auto;
+    width: 80vw;
     height: 100%;
-    flex-shrink: 0;
-    margin: 0 5px; /* Espace réduit entre les images */
+    margin: 0 10px;
 }
 
 .carousel-item img {
@@ -2238,40 +2241,70 @@ body {
     height: 100%;
     object-fit: cover;
     border-radius: 8px;
-    transform: none !important;
 }
 
-/* Animation de défilement infini */
-.carousel-inner {
-    display: flex;
-    animation: infiniteScroll 15s linear infinite;
-}
-
+/* Animation de défilement CONTINU sans arrêt */
 @keyframes infiniteScroll {
     0% {
         transform: translateX(0);
     }
     100% {
-        transform: translateX(calc(-60% * 3));  
+        transform: translateX(calc(-50% - 10px)); /* Défile exactement de la moitié */
     }
 }
 
-/* Ajustement pour le centrage */
-.carousel-item {
+/* Dupliquer les images via CSS pour la boucle parfaite */
+.carousel-inner::before,
+.carousel-inner::after {
+    content: '';
     display: flex;
-    justify-content: center;
-    align-items: center;
+    width: 50%;
+    height: 100%;
 }
 
-/* Réduire légèrement l'image centrale pour mieux voir les adjacentes */
-.carousel-item:nth-child(2) img {
-    width: 90%;
-    height: 90%;
+/* Empêcher le zoom des images des produits */
+.product-card img,
+.product-image,
+.cart-item-image,
+.facture-item-image,
+.admin-product-card img {
+    object-fit: contain !important; /* Affiche l'image complète sans zoom */
+    background-color: #f8f8f8; /* Fond neutre pour les images transparentes */
 }
 
-/* Styles pour les images adjacentes (complètes mais plus petites) */
-.carousel-item:not(:nth-child(2)) img {
-    width: 80%;
-    height: 80%;
-    opacity: 0.8; /* Légère transparence pour l'image centrale */
+/* Conteneur d'image avec taille fixe */
+.product-card {
+    overflow: hidden;
+}
+
+/* Assurer que les images gardent leurs proportions */
+.product-image {
+    width: 100% !important;
+    height: 120px !important;
+    object-fit: contain !important;
+    padding: 5px;
+    background: #fff;
+    border: 1px solid #eee;
+}
+
+/* Pour la page détail produit */
+.product-image-carousel .carousel-item img {
+    object-fit: contain !important;
+    background-color: #f8f8f8;
+}
+
+/* Pour le panier */
+.cart-item-image {
+    object-fit: contain !important;
+    background: #fff;
+    border: 1px solid #eee;
+    padding: 3px;
+}
+
+/* Pour les images admin */
+.admin-product-card img {
+    object-fit: contain !important;
+    background: #f8f8f8;
+    padding: 5px;
+    border: 1px solid #ddd;
 }
