@@ -186,6 +186,7 @@ function loadLocalData() {
 }
 
 // Configuration des écouteurs d'événements
+// Configuration des écouteurs d'événements
 function setupEventListeners() {
     // Navigation
     elements.navItems.forEach(item => {
@@ -195,12 +196,21 @@ function setupEventListeners() {
             navigateTo(pageId);
         });
     });
-    
-    // Recherche
+
+    // Recherche - Entrée dans le champ
+    elements.searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            handleSearch();
+        }
+    });
+
+    // Recherche - Input direct
     elements.searchInput.addEventListener('input', handleSearch);
+
+    // Recherche - Bouton clic
     elements.searchBtn.addEventListener('click', handleSearch);
-    
-    // Admin
+
+    // Admin : affichage du champ mot de passe
     elements.searchInput.addEventListener('keyup', (e) => {
         if (e.target.value.toUpperCase() === 'SOUHAIBOU2025') {
             elements.adminPasswordContainer.classList.remove('hidden');
@@ -208,20 +218,26 @@ function setupEventListeners() {
             elements.adminPasswordContainer.classList.add('hidden');
         }
     });
-    
+
+    // Admin : connexion
     elements.adminLoginBtn.addEventListener('click', handleAdminLogin);
-    
+
     // Boutons retour
     document.querySelectorAll('.back-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             navigateTo('home-page');
         });
     });
-    // Ajoutez ce code dans votre fonction setupEventListeners() ou initApp()
-document.getElementById('checkout-form').addEventListener('submit', function(e) {
-    e.preventDefault(); // Empêche le rechargement de la page
-    processOrder(); // Appelle votre fonction de traitement de commande
-});
+
+    // Formulaire de commande
+    const checkoutForm = document.getElementById('checkout-form');
+    if (checkoutForm) {
+        checkoutForm.addEventListener('submit', function(e) {
+            e.preventDefault(); // Empêche le rechargement
+            processOrder(); // Appelle ta fonction de commande
+        });
+    }
+
     // Voir plus de catégories
     document.querySelectorAll('.see-more').forEach(link => {
         link.addEventListener('click', (e) => {
@@ -231,6 +247,7 @@ document.getElementById('checkout-form').addEventListener('submit', function(e) 
         });
     });
 }
+
 
 // Navigation entre les pages
 function navigateTo(pageId) {
@@ -261,21 +278,58 @@ function navigateTo(pageId) {
 }
 
 // Gestion de la recherche
+// Gestion de la recherche
 function handleSearch() {
     const query = elements.searchInput.value.trim().toLowerCase();
     
     if (query.length === 0) {
-        renderHomePage();
+        showNotification('Veuillez entrer un terme de recherche', 'info');
         return;
     }
     
-    const filteredProducts = products.filter(product => 
-        product.name.toLowerCase().includes(query) ||
-        product.brand.toLowerCase().includes(query) ||
-        product.category.toLowerCase().includes(query)
-    );
+    // Recherche flexible dans les produits
+    const filteredProducts = products.filter(product => {
+        const searchText = `
+            ${product.name || ''} 
+            ${product.brand || ''} 
+            ${product.category || ''} 
+            ${product.description || ''}
+            ${product.specs ? Object.values(product.specs).join(' ') : ''}
+        `.toLowerCase();
+        
+        return searchText.includes(query);
+    });
     
-    renderSearchResults(filteredProducts);
+    // Afficher les résultats
+    showSearchResults(filteredProducts, query);
+}
+
+// Afficher les résultats de recherche
+function showSearchResults(products, query) {
+    navigateTo('search-results-page');
+    
+    const container = document.getElementById('search-results-container');
+    const noResults = document.getElementById('no-results-message');
+    const title = document.getElementById('search-results-title');
+    
+    // Mettre à jour le titre
+    title.textContent = `Résultats pour "${query}" (${products.length})`;
+    
+    // Vider le conteneur
+    container.innerHTML = '';
+    
+    if (products.length === 0) {
+        noResults.classList.remove('hidden');
+        container.classList.add('hidden');
+    } else {
+        noResults.classList.add('hidden');
+        container.classList.remove('hidden');
+        
+        // Ajouter les produits trouvés
+        products.forEach(product => {
+            container.appendChild(createProductCard(product));
+        });
+    }
 }
 
 // Connexion admin
