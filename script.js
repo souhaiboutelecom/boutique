@@ -498,7 +498,7 @@ function openProductPage(product) {
         document.getElementById('product-discount').classList.add('hidden');
     }
     
-    document.getElementById('product-delivery').textContent = product.delivery === 'free' ? 'Livraison gratuite' : 'Livraison payante';
+   document.getElementById('product-delivery').textContent = product.delivery === 'free' ? 'Livraison gratuite' : (product.delivery === 'paid' ? 'Livraison disponible' : 'Information livraison non disponible');
     
     // Afficher le stock si nécessaire
     if (product.stock !== undefined) {
@@ -506,9 +506,9 @@ function openProductPage(product) {
         if (product.stock < 10) {
             stockText = `Seulement ${product.stock} en stock`;
         } else if (product.stock <= 20) {
-            stockText = 'En rupture de stock';
+            stockText = 'En rupture de stock'; 
         }
-        // >20: on n'affiche rien
+        // >20: on n'aff e rien
     }
     
     // Caractéristiques
