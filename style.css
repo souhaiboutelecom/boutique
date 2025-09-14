@@ -2280,3 +2280,85 @@ body {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(20, 40, 160, 0.3);
 }
+
+/* ==================== STYLE RECHERCHE PRODUITS ==================== */
+
+#search-results-page .page-header {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background: white;
+    border-bottom: 1px solid #eee;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+#search-results-title {
+    margin: 0 auto;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1428A0;
+}
+
+#no-results-message {
+    text-align: center;
+    padding: 50px 20px;
+    color: #666;
+}
+
+#no-results-message i {
+    font-size: 50px;
+    color: #ddd;
+    margin-bottom: 15px;
+}
+
+#no-results-message h3 {
+    margin: 0 0 10px 0;
+    font-size: 18px;
+    color: #333;
+}
+
+.search-highlight {
+    background-color: #fff8e1;
+    padding: 2px 4px;
+    border-radius: 3px;
+  font-weight: 600;
+  color: #1428A0;
+}
+
+/* Amélioration du champ de recherche */
+.search-container {
+    display: flex;
+    align-items: center;
+    background: white;
+    border-radius: 25px;
+    padding: 5px 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin: 0 10px;
+    flex: 1;
+    max-width: 500px;
+}
+
+#search-input {
+    flex: 1;
+    border: none;
+    padding: 10px 5px;
+    font-size: 14px;
+    background: transparent;
+    outline: none;
+}
+
+#search-btn {
+    background: transparent;
+    border: none;
+    color: #1428A0;
+    cursor: pointer;
+    padding: 5px;
+    font-size: 16px;
+}
+
+#search-btn:hover {
+    color: #1E40AF;
+}
