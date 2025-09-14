@@ -2107,17 +2107,38 @@ function generateFacturePDF(orderNumber, customerInfo, orderData, total) {
         yPosition += 7;
     });
     
-    // Total
+    // Ligne séparatrice avant les totaux
     yPosition += 5;
+    doc.line(14, yPosition, 196, yPosition);
+    yPosition += 10;
+    
+    // Calculer les totaux
+    const subtotal = orderData.items.reduce((sum, item) => {
+        return sum + (item.quantity * (item.product.salePrice || item.product.normalPrice));
+    }, 0);
+    
+    const deliveryCost = orderData.deliveryCost || 0;
+    const totalAmount = subtotal + deliveryCost;
+    
+    // Afficher les totaux
     doc.setFontSize(12);
-    doc.setTextColor(20, 40, 160);
-    doc.text(`Total TTC: ${formatPrice(total)} FCFA`, 14, yPosition);
+    doc.text(`Sous-total: ${formatPrice(subtotal)} FCFA`, 14, yPosition);
+    yPosition += 8;
+    
+    doc.text(`Frais de livraison: ${deliveryCost > 0 ? formatPrice(deliveryCost) + ' FCFA' : 'Gratuit'}`, 14, yPosition);
+    yPosition += 8;
+    
+    doc.setFontSize(14);
+    doc.setFont(undefined, 'bold');
+    doc.text(`TOTAL: ${formatPrice(totalAmount)} FCFA`, 14, yPosition);
     
     // Pied de page
-    yPosition += 15;
+    yPosition += 20;
     doc.setFontSize(10);
     doc.setTextColor(100, 100, 100);
-    doc.text('Faite une capture pour garder cette page.', 105, yPosition, { align: 'center' });
+    doc.text('Merci pour votre confiance!', 105, yPosition, { align: 'center' });
+    yPosition += 6;
+    doc.text('Service Client: +221 77 123 45 67', 105, yPosition, { align: 'center' });
     
     // Sauvegarder le PDF
     doc.save(`facture_${orderNumber}.pdf`);
@@ -2170,11 +2191,18 @@ function processOrder() {
     const customerPhone = document.getElementById('customer-phone').value;
     const customerEmail = document.getElementById('customer-email').value;
     const customerAddress = document.getElementById('customer-address').value;
-    const deliveryOption = document.getElementById('delivery-zone').value;
+    const deliverySelect = document.getElementById('delivery-zone');
+    const deliveryOption = deliverySelect.value;
     
     // Valider le numéro de téléphone (obligatoire)
     if (!customerPhone) {
         showNotification('Le numéro de téléphone est obligatoire', 'error');
+        return;
+    }
+    
+    // Valider que le panier n'est pas vide
+    if (cart.length === 0) {
+        showNotification('Votre panier est vide', 'error');
         return;
     }
     
@@ -2192,7 +2220,10 @@ function processOrder() {
     let deliveryCost = 0;
     let deliveryName = "Récupération sur place";
     
-    if (deliveryOption !== "pickup") {
+    // Vérifier si tous les produits ont la livraison gratuite
+    const allFreeDelivery = cart.every(item => item.product.delivery === 'free');
+    
+    if (deliveryOption !== "pickup" && !allFreeDelivery) {
         const selectedDelivery = deliveryOptions.find(option => option.id === deliveryOption);
         if (selectedDelivery) {
             deliveryCost = selectedDelivery.price;
@@ -2222,6 +2253,8 @@ function processOrder() {
     cart.forEach(item => {
         const price = item.product.salePrice || item.product.normalPrice;
         const itemTotal = price * item.quantity;
+        const originalItemTotal = item.product.normalPrice * item.quantity;
+        const itemSavings = originalItemTotal - itemTotal;
         
         const itemElement = document.createElement('div');
         itemElement.className = 'facture-item';
@@ -2229,19 +2262,20 @@ function processOrder() {
             <img src="${item.product.images[0]}" alt="${item.product.name}" class="facture-item-image">
             <div class="facture-item-details">
                 <h4 class="facture-item-name">${item.product.name}</h4>
-                <p class="facture-item-price">${formatPrice(price)} FCFA x ${item.quantity} = ${formatPrice(itemTotal)} FCFA</p>
-                ${item.product.salePrice ? `<span class="discount-badge">Économie: ${formatPrice(item.product.normalPrice * item.quantity - itemTotal)} FCFA</span>` : ''}
+                <p class="facture-item-price">${formatPrice(price)} FCFA x ${item.quantity}</p>
+                <p class="facture-item-total">${formatPrice(itemTotal)} FCFA</p>
+                ${itemSavings > 0 ? `<p class="facture-item-savings">Économie: ${formatPrice(itemSavings)} FCFA</p>` : ''}
             </div>
         `;
         factureItems.appendChild(itemElement);
     });
     
-    // Afficher le récapitulatif des prix
+    // Afficher le récapitulatif des prix (version simplifiée)
     const factureTotal = document.getElementById('facture-total');
     factureTotal.innerHTML = `
         <div class="facture-summary">
             <div class="summary-row">
-                <span>Sous-total:</span>
+                <span>Sous-total (${cart.reduce((acc, item) => acc + item.quantity, 0)} articles):</span>
                 <span>${formatPrice(subtotal)} FCFA</span>
             </div>
             ${savings > 0 ? `
@@ -2251,13 +2285,16 @@ function processOrder() {
             </div>
             ` : ''}
             <div class="summary-row">
-                <span>Livraison (${deliveryName}):</span>
-                <span>${deliveryCost > 0 ? formatPrice(deliveryCost) + ' FCFA' : 'Gratuit'}</span>
+                <span>Frais de livraison:</span>
+                <span>${deliveryCost > 0 ? formatPrice(deliveryCost) + ' FCFA (' + deliveryName + ')' : 'Gratuit'}</span>
             </div>
             <div class="summary-row total">
                 <span><strong>Total:</strong></span>
                 <span><strong>${formatPrice(total)} FCFA</strong></span>
             </div>
+        </div>
+        <div class="payment-info">
+            <p>Mode de paiement: Paiement à la livraison</p>
         </div>
     `;
     
@@ -2272,7 +2309,7 @@ function processOrder() {
 }
 
 // Fonction pour sauvegarder la commande
-function saveOrder(orderNumber, name, phone, email, address, deliveryName, deliveryCost, total, subtotal) {
+function saveOrder(orderNumber, name, phone, email, address, deliveryOption, deliveryCost, total, subtotal) {
     const order = {
         id: orderNumber,
         date: new Date(),
@@ -2280,8 +2317,8 @@ function saveOrder(orderNumber, name, phone, email, address, deliveryName, deliv
         customerPhone: phone,
         customerEmail: email,
         customerAddress: address,
-        items: cart,
-        deliveryOption: deliveryName,
+        items: JSON.parse(JSON.stringify(cart)), // Copie profonde du panier
+        deliveryOption: deliveryOption,
         deliveryCost: deliveryCost,
         subtotal: subtotal,
         total: total,
