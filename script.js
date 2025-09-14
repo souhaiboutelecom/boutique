@@ -1366,11 +1366,11 @@ async function loadPendingOrders() {
         const ordersList = document.createElement('div');
         ordersList.className = 'orders-list';
         
-        snapshot.forEach(doc => {
-            const order = { id: doc.id, ...doc.data() };
-            const orderElement = createOrderElement(order, 'pending');
-            ordersList.appendChild(orderElement);
-        });
+       snapshot.forEach(doc => {
+    const order = { id: doc.id, ...doc.data() };
+    const orderElement = createOrderElement(order, 'pending');
+    ordersList.appendChild(orderElement);
+});
         
         pendingOrdersView.appendChild(ordersList);
         
@@ -1387,10 +1387,10 @@ function createOrderElement(order, status) {
     
     let actionsHTML = '';
     if (status === 'pending') {
-        actionsHTML = `
-            <button class="validate-order" data-id="${order.id}">Valider</button>
-            <button class="reject-order" data-id="${order.id}">Rejeter</button>
-        `;
+       actionsHTML = `
+    <button class="validate-order" data-id="${order.id}">Valider</button>
+    <button class="reject-order" data-id="${order.id}">Rejeter</button>
+`;
     }
     
     orderElement.innerHTML = `
@@ -1435,7 +1435,6 @@ function createOrderElement(order, status) {
     return orderElement;
 }
 
-// Validation d'une commande
 async function validateOrder(orderId) {
     try {
         await db.collection('orders').doc(orderId).update({
@@ -1450,12 +1449,8 @@ async function validateOrder(orderId) {
     }
 }
 
-// Rejet d'une commande
 async function rejectOrder(orderId) {
-    // Demander confirmation (3 fois comme demandé)
     if (!confirm('Voulez-vous vraiment rejeter cette commande ?')) return;
-    if (!confirm('Êtes-vous absolument sûr ?')) return;
-    if (!confirm('Cette action est irréversible. Confirmez le rejet.')) return;
     
     try {
         await db.collection('orders').doc(orderId).update({
