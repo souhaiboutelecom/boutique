@@ -1350,30 +1350,39 @@ async function deleteProduct(productId) {
 async function loadPendingOrders() {
     const pendingOrdersView = document.getElementById('pending-orders-view');
     if (!pendingOrdersView) return;
-    
+
     try {
         const snapshot = await db.collection('orders')
             .where('status', '==', 'pending')
             .get();
-            
+
         pendingOrdersView.innerHTML = '<h3>Commandes en attente</h3>';
-        
+
         if (snapshot.empty) {
             pendingOrdersView.innerHTML += '<p>Aucune commande en attente.</p>';
             return;
         }
-        
+
         const ordersList = document.createElement('div');
         ordersList.className = 'orders-list';
-        
-       snapshot.forEach(doc => {
-    const order = { id: doc.id, ...doc.data() };
-    const orderElement = createOrderElement(order, 'pending');
-    ordersList.appendChild(orderElement);
-});
-        
+
+        snapshot.forEach(doc => {
+            const order = { id: doc.id, ...doc.data() };
+            const orderElement = createOrderElement(order, 'pending');
+            ordersList.appendChild(orderElement);
+        });
+
         pendingOrdersView.appendChild(ordersList);
-        
+
+        // Ajouter les écouteurs pour les boutons
+        pendingOrdersView.querySelectorAll('.validate-order').forEach(btn => {
+            btn.addEventListener('click', () => validateOrder(btn.getAttribute('data-id')));
+        });
+
+        pendingOrdersView.querySelectorAll('.reject-order').forEach(btn => {
+            btn.addEventListener('click', () => rejectOrder(btn.getAttribute('data-id')));
+        });
+
     } catch (error) {
         console.error('Erreur lors du chargement des commandes:', error);
         pendingOrdersView.innerHTML = '<p>Erreur lors du chargement des commandes.</p>';
@@ -1451,14 +1460,23 @@ async function validateOrder(orderId) {
 
 async function rejectOrder(orderId) {
     if (!confirm('Voulez-vous vraiment rejeter cette commande ?')) return;
-    
+
     try {
+        // Vérifier si la commande existe
+        const orderDoc = await db.collection('orders').doc(orderId).get();
+        if (!orderDoc.exists) {
+            showNotification('Commande non trouvée', 'error');
+            return;
+        }
+
+        // Mettre à jour le statut de la commande
         await db.collection('orders').doc(orderId).update({
             status: 'rejected',
-            processedAt: new Date()
+            processedAt: firebase.firestore.FieldValue.serverTimestamp()
         });
+
         showNotification('Commande rejetée avec succès', 'success');
-        loadPendingOrders();
+        loadPendingOrders(); // Recharger la liste
     } catch (error) {
         console.error('Erreur lors du rejet de la commande:', error);
         showNotification('Erreur lors du rejet de la commande', 'error');
@@ -2038,141 +2056,239 @@ function showFacture(orderData, customerInfo) {
     return orderNumber;
 }
 
-// Fonction pour générer un PDF de la facture
-function generateFacturePDF(orderNumber, customerInfo, orderData, total) {
+function generateFacturePDF(orderNumber, customerInfo) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
     
-    // Logo et en-tête
-    doc.addImage('https://i.supaimg.com/b4a44dc2-c78a-45ff-a93b-dd14e4249939.jpg', 'JPEG', 14, 10, 30, 30);
-    doc.setFontSize(20);
-    doc.setTextColor(20, 40, 160); // #1428A0
-    doc.text('SOUHAIBOU TÉLÉCOM', 50, 20);
-    doc.setFontSize(10);
-    doc.setTextColor(100, 100, 100);
-    doc.text('Vente tous appareil Apple et accessoires', 50, 27);
+    // Couleurs
+    const primaryColor = [20, 40, 160]; // #1428A0
+    const secondaryColor = [100, 100, 100];
+    const accentColor = [255, 193, 7];
     
-    // Numéro de commande
-    doc.setFontSize(16);
-    doc.setTextColor(0, 0, 0);
-    doc.text(`Commande N°: ${orderNumber}`, 14, 50);
+    // En-tête avec fond coloré
+    doc.setFillColor(...primaryColor);
+    doc.rect(0, 0, 210, 30, 'F');
+    
+    // Logo et nom de l'entreprise
+    try {
+        doc.addImage('https://i.supaimg.com/b4a44dc2-c78a-45ff-a93b-dd14e4249939.jpg', 'JPEG', 14, 5, 20, 20);
+    } catch (e) {
+        console.log("Image non chargée, continuation sans logo");
+    }
+    
+    doc.setFontSize(18);
+    doc.setTextColor(255, 255, 255);
+    doc.text('SOUHAIBOU TÉLÉCOM', 105, 15, { align: 'center' });
+    doc.setFontSize(10);
+    doc.text('Vente tous appareils et accessoires', 105, 22, { align: 'center' });
+    
+    // Numéro de facture
+    doc.setFontSize(12);
+    doc.setTextColor(...primaryColor);
+    doc.text(`FACTURE N°: ${orderNumber}`, 14, 40);
+    
+    // Date et heure - FORMAT CORRIGÉ
+    const now = new Date();
+    const formattedDate = now.toLocaleDateString('fr-FR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    });
+    const formattedTime = now.toLocaleTimeString('fr-FR', {
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+    
+    doc.setFontSize(10);
+    doc.setTextColor(...secondaryColor);
+    doc.text(`Date: ${formattedDate}`, 160, 40, { align: 'right' });
+    doc.text(`Heure: ${formattedTime}`, 160, 45, { align: 'right' });
     
     // Informations client
     doc.setFontSize(12);
-    doc.text(`Client: ${customerInfo.name || 'Non spécifié'}`, 14, 60);
-    doc.text(`Téléphone: ${customerInfo.phone}`, 14, 67);
+    doc.setTextColor(...primaryColor);
+    doc.text('INFORMATIONS CLIENT', 14, 60);
+    doc.setDrawColor(...primaryColor);
+    doc.line(14, 62, 60, 62);
     
-    if (customerInfo.email) {
-        doc.text(`Email: ${customerInfo.email}`, 14, 74);
-    }
-    
-    if (customerInfo.address) {
-        doc.text(`Adresse: ${customerInfo.address}`, 14, customerInfo.email ? 81 : 74);
-    }
-    
-    // Date
-    const dateY = customerInfo.address ? 88 : (customerInfo.email ? 81 : 74);
-    doc.text(`Date et heure: ${new Date().toLocaleString('fr-FR')}`, 14, dateY);
-    
-    // Ligne séparatrice
-    doc.line(14, dateY + 5, 196, dateY + 5);
-    
-    // Articles
-    let yPosition = dateY + 15;
-    doc.setFontSize(12);
-    doc.setTextColor(20, 40, 160);
-    doc.text('Articles commandés:', 14, yPosition);
-    
-    yPosition += 10;
     doc.setFontSize(10);
     doc.setTextColor(0, 0, 0);
+    doc.text(`Nom: ${customerInfo.name || 'Non spécifié'}`, 14, 70);
+    doc.text(`Téléphone: ${customerInfo.phone}`, 14, 77);
     
-    orderData.items.forEach(item => {
+    if (customerInfo.email && customerInfo.email !== 'Non spécifié') {
+        doc.text(`Email: ${customerInfo.email}`, 14, 84);
+    }
+    
+    if (customerInfo.address && customerInfo.address !== 'Non spécifié') {
+        doc.text(`Adresse: ${customerInfo.address}`, 14, customerInfo.email ? 91 : 84);
+    }
+    
+    // Ligne séparatrice
+    doc.setDrawColor(200, 200, 200);
+    doc.line(14, 100, 196, 100);
+    
+    // En-tête du tableau des articles
+    let yPosition = 110;
+    doc.setFontSize(12);
+    doc.setTextColor(...primaryColor);
+    doc.text('DÉTAIL DE LA COMMANDE', 14, yPosition);
+    doc.line(14, yPosition + 2, 70, yPosition + 2);
+    
+    yPosition += 15;
+    
+    // En-têtes du tableau
+    doc.setFillColor(240, 240, 245);
+    doc.rect(14, yPosition - 5, 182, 8, 'F');
+    doc.setFontSize(10);
+    doc.setTextColor(...primaryColor);
+    doc.setFont(undefined, 'bold');
+    doc.text('Article', 16, yPosition);
+    doc.text('Prix Unitaire', 120, yPosition);
+    doc.text('Quantité', 150, yPosition);
+    doc.text('Total', 180, yPosition, { align: 'right' });
+    
+    yPosition += 10;
+    
+    // Articles - CORRECTION: Utiliser les articles du panier (cart)
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(0, 0, 0);
+    
+    let subtotal = 0;
+    
+    cart.forEach(item => {
         if (yPosition > 250) {
             doc.addPage();
             yPosition = 20;
+            
+            // Répéter l'en-tête du tableau sur les nouvelles pages
+            doc.setFillColor(240, 240, 245);
+            doc.rect(14, yPosition - 5, 182, 8, 'F');
+            doc.setFontSize(10);
+            doc.setTextColor(...primaryColor);
+            doc.setFont(undefined, 'bold');
+            doc.text('Article', 16, yPosition);
+            doc.text('Prix Unitaire', 120, yPosition);
+            doc.text('Quantité', 150, yPosition);
+            doc.text('Total', 180, yPosition, { align: 'right' });
+            
+            yPosition += 10;
+            doc.setFont(undefined, 'normal');
+            doc.setTextColor(0, 0, 0);
         }
         
-        const itemName = item.product.name.length > 40 ? item.product.name.substring(0, 37) + '...' : item.product.name;
-        const itemPrice = item.quantity * (item.product.salePrice || item.product.normalPrice);
+        const price = item.product.salePrice || item.product.normalPrice;
+        const totalItemPrice = price * item.quantity;
+        subtotal += totalItemPrice;
         
-        doc.text(`${item.quantity}x ${itemName}`, 20, yPosition);
-        doc.text(`${formatPrice(itemPrice)} FCFA`, 180, yPosition, { align: 'right' });
+        // Nom de l'article (avec troncature si nécessaire)
+        const itemName = item.product.name.length > 40 ? 
+            item.product.name.substring(0, 37) + '...' : item.product.name;
         
-        yPosition += 7;
+        doc.text(itemName, 16, yPosition);
+        doc.text(`${formatPrice(price)} FCFA`, 120, yPosition);
+        doc.text(`${item.quantity}`, 150, yPosition);
+        doc.text(`${formatPrice(totalItemPrice)} FCFA`, 180, yPosition, { align: 'right' });
+        
+        yPosition += 8;
     });
     
     // Ligne séparatrice avant les totaux
     yPosition += 5;
+    doc.setDrawColor(200, 200, 200);
     doc.line(14, yPosition, 196, yPosition);
     yPosition += 10;
     
-    // Calculer les totaux
-    const subtotal = orderData.items.reduce((sum, item) => {
-        return sum + (item.quantity * (item.product.salePrice || item.product.normalPrice));
+    // Totaux
+    doc.setFontSize(11);
+    doc.text(`Sous-total (${cart.reduce((acc, item) => acc + item.quantity, 0)} articles):`, 14, yPosition);
+    doc.text(`${formatPrice(subtotal)} FCFA`, 180, yPosition, { align: 'right' });
+    
+    yPosition += 8;
+    
+    // Calculer les économies totales
+    const totalSavings = cart.reduce((sum, item) => {
+        return sum + ((item.product.normalPrice - (item.product.salePrice || item.product.normalPrice)) * item.quantity);
     }, 0);
     
-    const deliveryCost = orderData.deliveryCost || 0;
-    const totalAmount = subtotal + deliveryCost;
+    if (totalSavings > 0) {
+        doc.setTextColor(0, 128, 0);
+        doc.text(`Économies:`, 14, yPosition);
+        doc.text(`-${formatPrice(totalSavings)} FCFA`, 180, yPosition, { align: 'right' });
+        yPosition += 8;
+        doc.setTextColor(0, 0, 0);
+    }
     
-    // Afficher les totaux
+    // Ligne de total
+    yPosition += 5;
+    doc.setDrawColor(...primaryColor);
+    doc.line(140, yPosition, 196, yPosition);
+    yPosition += 8;
+    
     doc.setFontSize(12);
-    doc.text(`Sous-total: ${formatPrice(subtotal)} FCFA`, 14, yPosition);
-    yPosition += 8;
-    
-    doc.text(`Frais de livraison: ${deliveryCost > 0 ? formatPrice(deliveryCost) + ' FCFA' : 'Gratuit'}`, 14, yPosition);
-    yPosition += 8;
-    
-    doc.setFontSize(14);
     doc.setFont(undefined, 'bold');
-    doc.text(`TOTAL: ${formatPrice(totalAmount)} FCFA`, 14, yPosition);
+    doc.setTextColor(...primaryColor);
+    doc.text('TOTAL:', 14, yPosition);
+    doc.text(`${formatPrice(subtotal)} FCFA`, 180, yPosition, { align: 'right' });
     
     // Pied de page
-    yPosition += 20;
-    doc.setFontSize(10);
-    doc.setTextColor(100, 100, 100);
+    yPosition = 270;
+    doc.setFontSize(9);
+    doc.setTextColor(...secondaryColor);
+    doc.setFont(undefined, 'normal');
     doc.text('Merci pour votre confiance!', 105, yPosition, { align: 'center' });
-    yPosition += 6;
+    yPosition += 5;
     doc.text('Service Client: +221 77 123 45 67', 105, yPosition, { align: 'center' });
+    yPosition += 5;
+    doc.text('www.souhaiboutelecom.com', 105, yPosition, { align: 'center' });
     
     // Sauvegarder le PDF
-    doc.save(`facture_${orderNumber}.pdf`);
+    doc.save(`Facture_${orderNumber}.pdf`);
 }
 
-// Modifiez la fonction de validation de commande
+// Modifier l'appel à generateFacturePDF
+document.getElementById('download-facture').addEventListener('click', function() {
+    // Récupérer les informations du client depuis la facture
+    const customerInfo = {
+        name: document.getElementById('facture-client').textContent,
+        phone: document.getElementById('facture-phone').textContent,
+        email: document.getElementById('facture-email').textContent,
+        address: document.getElementById('facture-address').textContent
+    };
+    
+    // Récupérer le numéro de commande
+    const orderNumber = document.getElementById('facture-number').textContent;
+    
+    // Appeler generateFacturePDF avec les bonnes données
+    generateFacturePDF(orderNumber, customerInfo);
+});
+
 async function validateOrder(orderId) {
     try {
-        // Récupérer les détails de la commande
+        // Vérifier si la commande existe
         const orderDoc = await db.collection('orders').doc(orderId).get();
         if (!orderDoc.exists) {
             showNotification('Commande non trouvée', 'error');
             return;
         }
-        
-        const order = orderDoc.data();
-        
-        // Générer et afficher la facture
-        const orderNumber = showFacture(order, {
-            name: order.customerName,
-            phone: order.customerPhone,
-            email: order.customerEmail,
-            address: order.customerAddress
-        });
-        
-        // Mettre à jour le statut de la commande avec le numéro de facture
+
+        // Mettre à jour le statut de la commande
         await db.collection('orders').doc(orderId).update({
             status: 'completed',
-            processedAt: new Date(),
-            orderNumber: orderNumber // Ajouter le numéro de commande
+            processedAt: firebase.firestore.FieldValue.serverTimestamp()
         });
-        
+
+        // Générer la facture
+        const orderData = orderDoc.data();
+        const orderNumber = showFacture(orderData, {
+            name: orderData.customerName,
+            phone: orderData.customerPhone,
+            email: orderData.customerEmail,
+            address: orderData.customerAddress
+        });
+
         showNotification('Commande validée avec succès', 'success');
-        
-        // Recharger la liste des commandes en attente
-        setTimeout(() => {
-            loadPendingOrders();
-        }, 1000);
-        
+        loadPendingOrders(); // Recharger la liste des commandes en attente
     } catch (error) {
         console.error('Erreur lors de la validation de la commande:', error);
         showNotification('Erreur lors de la validation de la commande', 'error');
