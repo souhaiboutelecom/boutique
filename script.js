@@ -2617,3 +2617,212 @@ document.getElementById('facture-modal').addEventListener('click', function(e) {
         navigateTo('home-page');
     }
 }); 
+
+
+
+
+// Fonction pour afficher la facture
+function showFacture(orderData) {
+    const modal = document.getElementById('facture-modal');
+    const factureNumber = document.getElementById('facture-number');
+    const factureClient = document.getElementById('facture-client');
+    const facturePhone = document.getElementById('facture-phone');
+    const factureEmail = document.getElementById('facture-email');
+    const factureAddress = document.getElementById('facture-address');
+    const factureDate = document.getElementById('facture-date');
+    const factureItems = document.getElementById('facture-items');
+    const factureSubtotal = document.getElementById('facture-subtotal');
+    const factureDelivery = document.getElementById('facture-delivery');
+    const factureSavings = document.getElementById('facture-savings');
+    const factureTotal = document.getElementById('facture-total');
+    
+    // Générer numéro de commande ST + timestamp
+    const orderNumber = 'ST' + Date.now().toString().slice(-6);
+    factureNumber.textContent = orderNumber;
+    
+    // Remplir les informations client
+    factureClient.textContent = orderData.name || 'Non spécifié';
+    facturePhone.textContent = orderData.phone || 'Non spécifié';
+    factureEmail.textContent = orderData.email || 'Non spécifié';
+    factureAddress.textContent = orderData.address || 'Non spécifié';
+    
+    // Date et heure actuelles
+    const now = new Date();
+    factureDate.textContent = now.toLocaleDateString('fr-FR') + ' ' + now.toLocaleTimeString('fr-FR');
+    
+    // Vider les articles précédents
+    factureItems.innerHTML = '';
+    
+    let subtotal = 0;
+    let totalSavings = 0;
+    let deliveryCost = orderData.deliveryCost || 0;
+    
+    // Ajouter les articles
+    orderData.items.forEach(item => {
+        const itemTotal = item.price * item.quantity;
+        const originalTotal = item.originalPrice * item.quantity;
+        const itemSavings = originalTotal - itemTotal;
+        
+        subtotal += itemTotal;
+        totalSavings += itemSavings;
+        
+        const itemElement = document.createElement('div');
+        itemElement.className = 'facture-item';
+        itemElement.innerHTML = `
+            <img src="${item.image}" alt="${item.name}" class="facture-item-image">
+            <div class="facture-item-details">
+                <div class="facture-item-name">${item.name}</div>
+                <div class="facture-item-price">${item.price.toLocaleString()} FCFA x ${item.quantity}</div>
+                ${item.originalPrice > item.price ? 
+                    `<div class="facture-item-price" style="text-decoration: line-through; color: #999;">
+                        ${item.originalPrice.toLocaleString()} FCFA
+                    </div>` : ''
+                }
+            </div>
+            <div class="facture-item-total">
+                <div class="facture-item-amount">${itemTotal.toLocaleString()} FCFA</div>
+                ${itemSavings > 0 ? 
+                    `<div class="facture-item-savings">-${itemSavings.toLocaleString()} FCFA</div>` : ''
+                }
+            </div>
+        `;
+        factureItems.appendChild(itemElement);
+    });
+    
+    // Calculer les totaux
+    const total = subtotal + deliveryCost;
+    
+    // Afficher les totaux
+    factureSubtotal.textContent = subtotal.toLocaleString() + ' FCFA';
+    factureDelivery.textContent = deliveryCost.toLocaleString() + ' FCFA';
+    factureSavings.textContent = totalSavings > 0 ? '-' + totalSavings.toLocaleString() + ' FCFA' : '0 FCFA';
+    factureTotal.textContent = total.toLocaleString() + ' FCFA';
+    
+    // Afficher la modal
+    modal.classList.remove('hidden');
+    
+    // Empêcher le défilement de la page background
+    document.body.style.overflow = 'hidden';
+}
+
+// Fonction pour générer le PDF
+function generatePDF(orderData) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    // Styles
+    const primaryColor = '#1428A0';
+    const secondaryColor = '#666';
+    
+    // En-tête
+    doc.setFillColor(20, 40, 160);
+    doc.rect(0, 0, 210, 40, 'F');
+    doc.setFontSize(20);
+    doc.setTextColor(255, 255, 255);
+    doc.text('SOUHAIBOU TÉLÉCOM', 105, 15, { align: 'center' });
+    doc.setFontSize(12);
+    doc.text('Excellence en Électronique & Accessoires', 105, 25, { align: 'center' });
+    
+    // Numéro de facture
+    doc.setFontSize(10);
+    doc.setTextColor(255, 255, 255);
+    doc.text(`Facture N°: ST${Date.now().toString().slice(-6)}`, 15, 35);
+    
+    // Informations client
+    doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0);
+    doc.text('INFORMATIONS CLIENT', 15, 50);
+    doc.setDrawColor(20, 40, 160);
+    doc.line(15, 52, 80, 52);
+    
+    doc.setFontSize(10);
+    doc.text(`Client: ${orderData.name || 'Non spécifié'}`, 15, 60);
+    doc.text(`Téléphone: ${orderData.phone || 'Non spécifié'}`, 15, 65);
+    doc.text(`Email: ${orderData.email || 'Non spécifié'}`, 15, 70);
+    doc.text(`Adresse: ${orderData.address || 'Non spécifié'}`, 15, 75);
+    doc.text(`Date: ${new Date().toLocaleDateString('fr-FR')}`, 15, 80);
+    
+    // Articles
+    let yPosition = 90;
+    doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0);
+    doc.text('ARTICLES COMMANDÉS', 15, yPosition);
+    doc.line(15, yPosition + 2, 80, yPosition + 2);
+    yPosition += 10;
+    
+    doc.setFontSize(10);
+    orderData.items.forEach((item, index) => {
+        if (yPosition > 250) {
+            doc.addPage();
+            yPosition = 20;
+        }
+        
+        const itemTotal = item.price * item.quantity;
+        doc.text(`${item.name}`, 15, yPosition);
+        doc.text(`${item.quantity} x ${item.price.toLocaleString()} FCFA`, 150, yPosition);
+        doc.text(`${itemTotal.toLocaleString()} FCFA`, 180, yPosition);
+        yPosition += 5;
+    });
+    
+    // Totaux
+    yPosition += 10;
+    const subtotal = orderData.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const deliveryCost = orderData.deliveryCost || 0;
+    const total = subtotal + deliveryCost;
+    
+    doc.setFontSize(10);
+    doc.text(`Sous-total: ${subtotal.toLocaleString()} FCFA`, 150, yPosition);
+    yPosition += 5;
+    doc.text(`Livraison: ${deliveryCost.toLocaleString()} FCFA`, 150, yPosition);
+    yPosition += 5;
+    doc.setFontSize(12);
+    doc.setFont(undefined, 'bold');
+    doc.text(`TOTAL: ${total.toLocaleString()} FCFA`, 150, yPosition);
+    
+    // Pied de page
+    doc.setFontSize(8);
+    doc.setTextColor(secondaryColor);
+    doc.text('Merci pour votre confiance !', 105, 280, { align: 'center' });
+    doc.text('Service Client: +221 77 123 45 67', 105, 285, { align: 'center' });
+    
+    // Sauvegarder le PDF
+    doc.save(`facture-ST${Date.now().toString().slice(-6)}.pdf`);
+}
+
+// Événements
+document.addEventListener('DOMContentLoaded', function() {
+    const downloadBtn = document.getElementById('download-facture');
+    const closeBtn = document.querySelector('.close-facture');
+    const modal = document.getElementById('facture-modal');
+    
+    downloadBtn.addEventListener('click', function() {
+        // Récupérer les données de la commande actuelle
+        const orderData = getCurrentOrderData();
+        generatePDF(orderData);
+    });
+    
+    closeBtn.addEventListener('click', function() {
+        modal.classList.add('hidden');
+        document.body.style.overflow = '';
+    });
+    
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+    });
+});
+
+// Fonction pour récupérer les données de commande actuelles
+function getCurrentOrderData() {
+    // Implémentez cette fonction selon votre structure de données
+    return {
+        name: document.getElementById('facture-client').textContent,
+        phone: document.getElementById('facture-phone').textContent,
+        email: document.getElementById('facture-email').textContent,
+        address: document.getElementById('facture-address').textContent,
+        items: [], // Remplir avec les articles du panier
+        deliveryCost: 0 // Remplir avec le coût de livraison
+    };
+}
