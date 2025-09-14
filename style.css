@@ -2143,3 +2143,140 @@ body {
     padding: 5px;
     border: 1px solid #ddd;
 }
+
+
+/* ==================== STYLE RECHERCHE FACTURE ==================== */
+
+.facture-search-section {
+    background: linear-gradient(135deg, #1428A0 0%, #1E40AF 100%);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+    color: white;
+    box-shadow: 0 8px 25px rgba(20, 40, 160, 0.15);
+}
+
+.facture-search-section h3 {
+    margin: 0 0 15px 0;
+    font-size: 18px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.search-facture-form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+#facture-search-input {
+    flex: 1;
+    padding: 12px 15px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+#facture-search-btn {
+    padding: 12px 20px;
+    background: #FF6B00;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#facture-search-btn:hover {
+    background: #E55A00;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 107, 0, 0.3);
+}
+
+.facture-result {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid;
+}
+
+.facture-result.completed {
+    border-left-color: #28a745;
+}
+
+.facture-result.rejected {
+    border-left-color: #dc3545;
+}
+
+.facture-result.pending {
+    border-left-color: #ffc107;
+}
+
+.facture-result.error {
+    border-left-color: #6c757d;
+}
+
+.result-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.result-header i {
+    font-size: 24px;
+}
+
+.result-header h4 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.facture-result.completed .result-header i {
+    color: #28a745;
+}
+
+.facture-result.rejected .result-header i {
+    color: #dc3545;
+}
+
+.result-details {
+    margin-bottom: 20px;
+}
+
+.result-details p {
+    margin: 8px 0;
+    font-size: 14px;
+}
+
+.download-facture-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #1428A0 0%, #1E40AF 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.download-facture-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(20, 40, 160, 0.3);
+}
