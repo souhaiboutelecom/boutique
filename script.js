@@ -2163,33 +2163,65 @@ async function validateOrder(orderId) {
     }
 }
 
+// Fonction pour traiter la commande et afficher la facture
 function processOrder() {
-    // Récupérer les données du formulaire
+    // Récupérer les valeurs du formulaire
     const customerName = document.getElementById('customer-name').value;
     const customerPhone = document.getElementById('customer-phone').value;
     const customerEmail = document.getElementById('customer-email').value;
     const customerAddress = document.getElementById('customer-address').value;
+    const deliveryOption = document.getElementById('delivery-zone').value;
     
-    // Générer un numéro de commande unique
-    const orderNumber = 'CMD-' + Date.now();
+    // Valider le numéro de téléphone (obligatoire)
+    if (!customerPhone) {
+        showNotification('Le numéro de téléphone est obligatoire', 'error');
+        return;
+    }
+    
+    // Calculer les totaux du panier
+    let subtotal = 0;
+    let originalTotal = 0;
+    
+    cart.forEach(item => {
+        const price = item.product.salePrice || item.product.normalPrice;
+        subtotal += price * item.quantity;
+        originalTotal += item.product.normalPrice * item.quantity;
+    });
+    
+    // Calculer les frais de livraison
+    let deliveryCost = 0;
+    let deliveryName = "Récupération sur place";
+    
+    if (deliveryOption !== "pickup") {
+        const selectedDelivery = deliveryOptions.find(option => option.id === deliveryOption);
+        if (selectedDelivery) {
+            deliveryCost = selectedDelivery.price;
+            deliveryName = selectedDelivery.name;
+        }
+    }
+    
+    // Calculer le total final
+    const total = subtotal + deliveryCost;
+    const savings = originalTotal - subtotal;
+    
+    // Générer un numéro de commande
+    const orderNumber = 'CMD-' + Math.floor(100000 + Math.random() * 900000);
     
     // Remplir la facture avec les informations
     document.getElementById('facture-number').textContent = orderNumber;
-    document.getElementById('facture-client').textContent = customerName;
+    document.getElementById('facture-client').textContent = customerName || 'Non spécifié';
     document.getElementById('facture-phone').textContent = customerPhone;
     document.getElementById('facture-email').textContent = customerEmail || 'Non spécifié';
     document.getElementById('facture-address').textContent = customerAddress || 'Non spécifié';
-    document.getElementById('facture-date').textContent = new Date().toLocaleString();
+    document.getElementById('facture-date').textContent = new Date().toLocaleString('fr-FR');
     
-    // Ajouter les articles du panier
+    // Ajouter les articles du panier à la facture
     const factureItems = document.getElementById('facture-items');
     factureItems.innerHTML = '';
     
-    let total = 0;
     cart.forEach(item => {
         const price = item.product.salePrice || item.product.normalPrice;
         const itemTotal = price * item.quantity;
-        total += itemTotal;
         
         const itemElement = document.createElement('div');
         itemElement.className = 'facture-item';
@@ -2198,14 +2230,35 @@ function processOrder() {
             <div class="facture-item-details">
                 <h4 class="facture-item-name">${item.product.name}</h4>
                 <p class="facture-item-price">${formatPrice(price)} FCFA x ${item.quantity} = ${formatPrice(itemTotal)} FCFA</p>
+                ${item.product.salePrice ? `<span class="discount-badge">Économie: ${formatPrice(item.product.normalPrice * item.quantity - itemTotal)} FCFA</span>` : ''}
             </div>
         `;
         factureItems.appendChild(itemElement);
     });
     
-    // Afficher le total
-    document.getElementById('facture-total').innerHTML = `
-        <p>Total: ${formatPrice(total)} FCFA</p>
+    // Afficher le récapitulatif des prix
+    const factureTotal = document.getElementById('facture-total');
+    factureTotal.innerHTML = `
+        <div class="facture-summary">
+            <div class="summary-row">
+                <span>Sous-total:</span>
+                <span>${formatPrice(subtotal)} FCFA</span>
+            </div>
+            ${savings > 0 ? `
+            <div class="summary-row discount">
+                <span>Économies:</span>
+                <span>-${formatPrice(savings)} FCFA</span>
+            </div>
+            ` : ''}
+            <div class="summary-row">
+                <span>Livraison (${deliveryName}):</span>
+                <span>${deliveryCost > 0 ? formatPrice(deliveryCost) + ' FCFA' : 'Gratuit'}</span>
+            </div>
+            <div class="summary-row total">
+                <span><strong>Total:</strong></span>
+                <span><strong>${formatPrice(total)} FCFA</strong></span>
+            </div>
+        </div>
     `;
     
     // Fermer le modal de commande
@@ -2214,8 +2267,48 @@ function processOrder() {
     // Afficher le modal de facture
     document.getElementById('facture-modal').classList.remove('hidden');
     
-    // Ajouter l'écouteur pour le bouton de téléchargement
-    document.getElementById('download-facture').addEventListener('click', downloadFacture);
+    // Sauvegarder la commande
+    saveOrder(orderNumber, customerName, customerPhone, customerEmail, customerAddress, deliveryName, deliveryCost, total, subtotal);
+}
+
+// Fonction pour sauvegarder la commande
+function saveOrder(orderNumber, name, phone, email, address, deliveryName, deliveryCost, total, subtotal) {
+    const order = {
+        id: orderNumber,
+        date: new Date(),
+        customerName: name,
+        customerPhone: phone,
+        customerEmail: email,
+        customerAddress: address,
+        items: cart,
+        deliveryOption: deliveryName,
+        deliveryCost: deliveryCost,
+        subtotal: subtotal,
+        total: total,
+        status: 'pending'
+    };
+    
+    // Ajouter à l'historique local
+    orders.push(order);
+    localStorage.setItem('orders', JSON.stringify(orders));
+    
+    // Envoyer à Firebase (si en ligne)
+    if (navigator.onLine) {
+        try {
+            db.collection('orders').add(order);
+            showNotification('Commande enregistrée avec succès!', 'success');
+        } catch (error) {
+            console.error('Erreur enregistrement Firebase:', error);
+            showNotification('Commande enregistrée localement', 'info');
+        }
+    } else {
+        showNotification('Commande enregistrée localement (hors ligne)', 'info');
+    }
+    
+    // Vider le panier
+    cart = [];
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartCount();
 }
 
 
@@ -2339,3 +2432,188 @@ document.querySelector('.close-facture').addEventListener('click', function() {
     document.getElementById('facture-modal').classList.add('hidden');
     navigateTo('home-page');
 });
+
+
+// ==================== GESTION COMPLÈTE DE LA FACTURE ====================
+
+// Écouter la soumission du formulaire de commande
+document.getElementById('checkout-form').addEventListener('submit', function(e) {
+    e.preventDefault(); // Empêche le rechargement de la page
+    processOrder(); // Traite la commande
+});
+
+// Fonction pour traiter la commande et afficher la facture
+function processOrder() {
+    // Récupérer les valeurs du formulaire
+    const customerName = document.getElementById('customer-name').value;
+    const customerPhone = document.getElementById('customer-phone').value;
+    const customerEmail = document.getElementById('customer-email').value;
+    const customerAddress = document.getElementById('customer-address').value;
+    const deliverySelect = document.getElementById('delivery-zone');
+    const deliveryOption = deliverySelect.options[deliverySelect.selectedIndex].text;
+    const deliveryCost = deliverySelect.value === 'pickup' ? 0 : 
+                        parseInt(deliverySelect.value.split('-')[1]) || 0;
+    
+    // Valider le numéro de téléphone (obligatoire)
+    if (!customerPhone) {
+        showNotification('Le numéro de téléphone est obligatoire', 'error');
+        return;
+    }
+    
+    // Valider que le panier n'est pas vide
+    if (cart.length === 0) {
+        showNotification('Votre panier est vide', 'error');
+        return;
+    }
+    
+    // Calculer les totaux du panier
+    let subtotal = 0;
+    let originalTotal = 0;
+    
+    cart.forEach(item => {
+        const price = item.product.salePrice || item.product.normalPrice;
+        subtotal += price * item.quantity;
+        originalTotal += item.product.normalPrice * item.quantity;
+    });
+    
+    // Calculer le total final
+    const total = subtotal + deliveryCost;
+    const savings = originalTotal - subtotal;
+    
+    // Générer un numéro de commande
+    const orderNumber = 'CMD-' + Math.floor(100000 + Math.random() * 900000);
+    
+    // Remplir la facture avec les informations
+    document.getElementById('facture-number').textContent = orderNumber;
+    document.getElementById('facture-client').textContent = customerName || 'Non spécifié';
+    document.getElementById('facture-phone').textContent = customerPhone;
+    document.getElementById('facture-email').textContent = customerEmail || 'Non spécifié';
+    document.getElementById('facture-address').textContent = customerAddress || 'Non spécifié';
+    document.getElementById('facture-date').textContent = new Date().toLocaleString('fr-FR');
+    
+    // Ajouter les articles du panier à la facture
+    const factureItems = document.getElementById('facture-items');
+    factureItems.innerHTML = '';
+    
+    cart.forEach(item => {
+        const price = item.product.salePrice || item.product.normalPrice;
+        const itemTotal = price * item.quantity;
+        const originalItemTotal = item.product.normalPrice * item.quantity;
+        const itemSavings = originalItemTotal - itemTotal;
+        
+        const itemElement = document.createElement('div');
+        itemElement.className = 'facture-item';
+        itemElement.innerHTML = `
+            <img src="${item.product.images[0]}" alt="${item.product.name}" class="facture-item-image">
+            <div class="facture-item-details">
+                <h4 class="facture-item-name">${item.product.name}</h4>
+                <p class="facture-item-price">${formatPrice(price)} FCFA x ${item.quantity}</p>
+                <p class="facture-item-total">${formatPrice(itemTotal)} FCFA</p>
+                ${itemSavings > 0 ? `<p class="facture-item-savings">Économie: ${formatPrice(itemSavings)} FCFA</p>` : ''}
+            </div>
+        `;
+        factureItems.appendChild(itemElement);
+    });
+    
+    // Afficher le récapitulatif des prix
+    const factureTotal = document.getElementById('facture-total');
+    factureTotal.innerHTML = `
+        <div class="facture-summary">
+            <div class="summary-row">
+                <span>Sous-total (${cart.reduce((acc, item) => acc + item.quantity, 0)} articles):</span>
+                <span>${formatPrice(subtotal)} FCFA</span>
+            </div>
+            ${savings > 0 ? `
+            <div class="summary-row discount">
+                <span>Économies:</span>
+                <span>-${formatPrice(savings)} FCFA</span>
+            </div>
+            ` : ''}
+            <div class="summary-row">
+                <span>Frais de livraison (${deliveryOption.split(' - ')[0]}):</span>
+                <span>${deliveryCost > 0 ? formatPrice(deliveryCost) + ' FCFA' : 'Gratuit'}</span>
+            </div>
+            <div class="summary-row total">
+                <span><strong>Total:</strong></span>
+                <span><strong>${formatPrice(total)} FCFA</strong></span>
+            </div>
+        </div>
+        <div class="payment-info">
+            <p>Mode de paiement: Paiement à la livraison</p>
+        </div>
+    `;
+    
+    // Fermer le modal de commande
+    document.getElementById('checkout-modal').classList.add('hidden');
+    
+    // Afficher le modal de facture
+    document.getElementById('facture-modal').classList.remove('hidden');
+    
+    // Sauvegarder la commande
+    saveOrder(orderNumber, customerName, customerPhone, customerEmail, customerAddress, deliveryOption, deliveryCost, total, subtotal);
+}
+
+// Fonction pour sauvegarder la commande
+function saveOrder(orderNumber, name, phone, email, address, deliveryOption, deliveryCost, total, subtotal) {
+    const order = {
+        id: orderNumber,
+        date: new Date(),
+        customerName: name,
+        customerPhone: phone,
+        customerEmail: email,
+        customerAddress: address,
+        items: JSON.parse(JSON.stringify(cart)), // Copie profonde du panier
+        deliveryOption: deliveryOption,
+        deliveryCost: deliveryCost,
+        subtotal: subtotal,
+        total: total,
+        status: 'pending'
+    };
+    
+    // Ajouter à l'historique local
+    orders.push(order);
+    localStorage.setItem('orders', JSON.stringify(orders));
+    
+    // Envoyer à Firebase (si en ligne)
+    if (navigator.onLine) {
+        try {
+            db.collection('orders').add(order);
+            showNotification('Commande enregistrée avec succès!', 'success');
+        } catch (error) {
+            console.error('Erreur enregistrement Firebase:', error);
+            showNotification('Commande enregistrée localement', 'info');
+        }
+    } else {
+        showNotification('Commande enregistrée localement (hors ligne)', 'info');
+    }
+    
+    // Vider le panier
+    cart = [];
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartCount();
+}
+
+// Télécharger la facture
+document.getElementById('download-facture').addEventListener('click', function() {
+    // Utiliser html2canvas pour capturer la facture
+    html2canvas(document.querySelector('.facture-content')).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `facture-${document.getElementById('facture-number').textContent}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    });
+});
+
+// Fermer la facture
+document.querySelector('.close-facture').addEventListener('click', function() {
+    document.getElementById('facture-modal').classList.add('hidden');
+    navigateTo('home-page');
+});
+
+// Fermer la facture en cliquant à l'extérieur
+document.getElementById('facture-modal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        this.classList.add('hidden');
+        navigateTo('home-page');
+    }
+}); 
