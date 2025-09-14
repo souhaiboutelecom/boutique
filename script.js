@@ -783,6 +783,9 @@ function renderCartPage() {
             showNotification('Aucune commande dans l\'historique', 'info');
         }
     });
+    
+    // Ajouter l'appel dans la fonction renderCartPage
+    addFactureSearchToCart();
 }
 
 // Rendu de la page favoris
@@ -2357,7 +2360,7 @@ function processOrder() {
     const savings = originalTotal - subtotal;
     
     // Générer un numéro de commande
-    const orderNumber = 'CMD-' + Math.floor(100000 + Math.random() * 900000);
+const orderNumber = 'ST' + Math.floor(300000 + Math.random() * 600000);
     
     // Remplir la facture avec les informations
     document.getElementById('facture-number').textContent = orderNumber;
@@ -2563,7 +2566,7 @@ function processOrder() {
     const savings = originalTotal - subtotal;
     
     // Générer un numéro de commande
-    const orderNumber = 'CMD-' + Math.floor(100000 + Math.random() * 900000);
+    const orderNumber = 'ST-' + Math.floor(100000 + Math.random() * 900000);
     
     // Remplir la facture avec les informations
     document.getElementById('facture-number').textContent = orderNumber;
@@ -2670,7 +2673,7 @@ function processOrder() {
     const savings = originalTotal - subtotal;
     
     // Générer un numéro de commande
-    const orderNumber = 'CMD-' + Math.floor(100000 + Math.random() * 900000);
+    const orderNumber = 'ST-' + Math.floor(100000 + Math.random() * 900000);
     
     // Remplir la facture avec les informations
     document.getElementById('facture-number').textContent = orderNumber;
@@ -2999,3 +3002,339 @@ function getCurrentOrderData() {
         deliveryCost: 0 // Remplir avec le coût de livraison
     };
 }
+
+
+
+
+// ==================== SYSTÈME DE RECHERCHE DE FACTURE ====================
+
+// Ajouter le champ de recherche dans le panier
+function addFactureSearchToCart() {
+    const cartContent = document.querySelector('.cart-content');
+    
+    // Vérifier si le champ de recherche n'existe pas déjà
+    if (!document.getElementById('facture-search-container')) {
+        const searchContainer = document.createElement('div');
+        searchContainer.id = 'facture-search-container';
+        searchContainer.innerHTML = `
+            <div class="facture-search-section">
+                <h3><i class="fas fa-receipt"></i> OBTENIR MA FACTURE MAINTENANT</h3>
+                <div class="search-facture-form">
+<input type="text" id="facture-search-input" placeholder="Entrez votre numéro de commande (ex: ST685010 ou ST-685010)">
+                    <button id="facture-search-btn"><i class="fas fa-search"></i> Rechercher</button>
+                </div>
+                <div id="facture-search-result" class="hidden">
+                    <!-- Les résultats de recherche s'afficheront ici -->
+                </div>
+            </div>
+        `;
+        
+        // Ajouter à la fin du contenu du panier
+        cartContent.appendChild(searchContainer);
+        
+        // Ajouter les écouteurs d'événements
+        document.getElementById('facture-search-btn').addEventListener('click', searchFacture);
+        document.getElementById('facture-search-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') searchFacture();
+        });
+    }
+}
+
+// Rechercher une facture
+async function searchFacture() {
+    let orderNumber = document.getElementById('facture-search-input').value.trim().toUpperCase();
+    const resultContainer = document.getElementById('facture-search-result');
+    
+    if (!orderNumber) {
+        showNotification('Veuillez entrer un numéro de commande', 'error');
+        return;
+    }
+    
+    // Normaliser le numéro de commande (supprimer les tirets et espaces)
+    orderNumber = orderNumber.replace(/-/g, '').replace(/\s/g, '');
+    
+    // Vérifier le format du numéro de commande
+    if (!orderNumber.startsWith('ST') || orderNumber.length !== 8 || isNaN(orderNumber.substring(2))) {
+        showNotification('Numéro de commande invalide. Format: ST123456', 'error');
+        return;
+    }
+    
+    try {
+        // Rechercher la commande dans Firebase
+        const ordersQuery = await db.collection('orders')
+            .where('id', '==', orderNumber)
+            .get();
+        
+        if (ordersQuery.empty) {
+            // Essayer avec l'ancien format (avec tiret) pour compatibilité
+            const oldFormatNumber = orderNumber.substring(0, 2) + '-' + orderNumber.substring(2);
+            const oldFormatQuery = await db.collection('orders')
+                .where('id', '==', oldFormatNumber)
+                .get();
+                
+            if (oldFormatQuery.empty) {
+                resultContainer.innerHTML = `
+                    <div class="facture-result error">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <p>Aucune commande trouvée avec le numéro ${orderNumber}</p>
+                    </div>
+                `;
+                resultContainer.classList.remove('hidden');
+                return;
+            } else {
+                // Trouvé avec l'ancien format
+                const orderDoc = oldFormatQuery.docs[0];
+                const orderData = orderDoc.data();
+                displayOrderResult(orderData, resultContainer);
+            }
+        } else {
+            // Trouvé avec le nouveau format
+            const orderDoc = ordersQuery.docs[0];
+            const orderData = orderDoc.data();
+            displayOrderResult(orderData, resultContainer);
+        }
+        
+    } catch (error) {
+        console.error('Erreur lors de la recherche:', error);
+        resultContainer.innerHTML = `
+            <div class="facture-result error">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>Une erreur s'est produite lors de la recherche</p>
+            </div>
+        `;
+        resultContainer.classList.remove('hidden');
+    }
+}
+
+// Afficher le résultat de la commande
+function displayOrderResult(orderData, resultContainer) {
+    // Afficher le résultat selon le statut
+    if (orderData.status === 'completed') {
+        resultContainer.innerHTML = createFactureResultHTML(orderData, 'completed');
+    } else if (orderData.status === 'rejected') {
+        resultContainer.innerHTML = createFactureResultHTML(orderData, 'rejected');
+    } else {
+        resultContainer.innerHTML = `
+            <div class="facture-result pending">
+                <i class="fas fa-clock"></i>
+                <p>Votre commande ${orderData.id} est en attente de traitement</p>
+                <p>Revenez ultérieurement pour télécharger votre facture</p>
+            </div>
+        `;
+    }
+    
+    resultContainer.classList.remove('hidden');
+    
+    // Ajouter l'écouteur pour le bouton de téléchargement
+    const downloadBtn = resultContainer.querySelector('.download-facture-btn');
+    if (downloadBtn) {
+        downloadBtn.addEventListener('click', () => {
+            generateFacturePDF(orderData, orderData.status);
+        });
+    }
+}
+// Créer le HTML du résultat de recherche
+function createFactureResultHTML(orderData, status) {
+    const isCompleted = status === 'completed';
+    
+    return `
+        <div class="facture-result ${status}">
+            <div class="result-header">
+                <i class="fas ${isCompleted ? 'fa-check-circle' : 'fa-times-circle'}"></i>
+                <h4>${isCompleted ? 'FACTURE DISPONIBLE' : 'COMMANDE REJETÉE'}</h4>
+            </div>
+            <div class="result-details">
+                <p><strong>Numéro de commande:</strong> ${orderData.id}</p>
+                <p><strong>Date:</strong> ${new Date(orderData.date.seconds * 1000).toLocaleDateString('fr-FR')}</p>
+                <p><strong>Client:</strong> ${orderData.customerName}</p>
+                <p><strong>Total:</strong> ${formatPrice(orderData.total)} FCFA</p>
+                <p><strong>Statut:</strong> ${isCompleted ? 'Validée' : 'Rejetée'}</p>
+            </div>
+            <button class="download-facture-btn">
+                <i class="fas fa-download"></i> Télécharger le PDF
+            </button>
+        </div>
+    `;
+}
+
+// Générer une facture PDF professionnelle
+function generateFacturePDF(orderData, status) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    const isCompleted = status === 'completed';
+    const pageWidth = doc.internal.pageSize.getWidth();
+    
+    // Couleurs
+    const primaryColor = isCompleted ? [30, 100, 200] : [200, 60, 60];
+    const secondaryColor = [100, 100, 100];
+    const lightColor = [240, 240, 245];
+    
+    // En-tête avec fond coloré
+    doc.setFillColor(...primaryColor);
+    doc.rect(0, 0, pageWidth, 30, 'F');
+    
+    // Logo et nom de l'entreprise
+    doc.setFontSize(20);
+    doc.setTextColor(255, 255, 255);
+    doc.text('SOUHAIBOU TÉLÉCOM', pageWidth / 2, 15, { align: 'center' });
+    doc.setFontSize(10);
+    doc.text('Excellence en Électronique & Accessoires', pageWidth / 2, 22, { align: 'center' });
+    
+    // Numéro de facture et date
+    doc.setFontSize(12);
+    doc.setTextColor(...primaryColor);
+    doc.text(`FACTURE N°: ${orderData.id}`, 14, 45);
+    doc.setFontSize(10);
+    doc.setTextColor(...secondaryColor);
+    doc.text(`Date: ${new Date(orderData.date.seconds * 1000).toLocaleDateString('fr-FR')}`, pageWidth - 14, 45, { align: 'right' });
+    
+    // Statut de la commande
+    doc.setFontSize(12);
+    doc.setTextColor(...primaryColor);
+    doc.text(`STATUT: ${isCompleted ? 'VALIDÉE' : 'REJETÉE'}`, pageWidth / 2, 55, { align: 'center' });
+    
+    // Informations client
+    doc.setFontSize(12);
+    doc.setTextColor(...primaryColor);
+    doc.text('INFORMATIONS CLIENT', 14, 70);
+    doc.setDrawColor(...primaryColor);
+    doc.line(14, 72, 60, 72);
+    
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`Nom: ${orderData.customerName || 'Non spécifié'}`, 14, 80);
+    doc.text(`Téléphone: ${orderData.customerPhone}`, 14, 87);
+    
+    if (orderData.customerEmail && orderData.customerEmail !== 'Non spécifié') {
+        doc.text(`Email: ${orderData.customerEmail}`, 14, 94);
+    }
+    
+    if (orderData.customerAddress && orderData.customerAddress !== 'Non spécifié') {
+        doc.text(`Adresse: ${orderData.customerAddress}`, 14, orderData.customerEmail ? 101 : 94);
+    }
+    
+    // Ligne séparatrice
+    doc.setDrawColor(200, 200, 200);
+    doc.line(14, 110, pageWidth - 14, 110);
+    
+    // En-tête du tableau des articles
+    let yPosition = 120;
+    doc.setFontSize(12);
+    doc.setTextColor(...primaryColor);
+    doc.text('DÉTAIL DE LA COMMANDE', 14, yPosition);
+    doc.line(14, yPosition + 2, 70, yPosition + 2);
+    
+    yPosition += 15;
+    
+    // En-têtes du tableau
+    doc.setFillColor(...lightColor);
+    doc.rect(14, yPosition - 5, pageWidth - 28, 8, 'F');
+    doc.setFontSize(10);
+    doc.setTextColor(...primaryColor);
+    doc.setFont(undefined, 'bold');
+    doc.text('Article', 16, yPosition);
+    doc.text('Prix Unitaire', 120, yPosition);
+    doc.text('Quantité', 150, yPosition);
+    doc.text('Total', 180, yPosition, { align: 'right' });
+    
+    yPosition += 10;
+    
+    // Articles
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(0, 0, 0);
+    
+    orderData.items.forEach(item => {
+        if (yPosition > 250) {
+            doc.addPage();
+            yPosition = 20;
+        }
+        
+        const price = item.product.salePrice || item.product.normalPrice;
+        const totalItemPrice = price * item.quantity;
+        
+        // Nom de l'article (avec troncature si nécessaire)
+        const itemName = item.product.name.length > 40 ? 
+            item.product.name.substring(0, 37) + '...' : item.product.name;
+        
+        doc.text(itemName, 16, yPosition);
+        doc.text(`${formatPrice(price)} FCFA`, 120, yPosition);
+        doc.text(`${item.quantity}`, 150, yPosition);
+        doc.text(`${formatPrice(totalItemPrice)} FCFA`, 180, yPosition, { align: 'right' });
+        
+        yPosition += 8;
+    });
+    
+    // Ligne séparatrice avant les totaux
+    yPosition += 5;
+    doc.setDrawColor(200, 200, 200);
+    doc.line(14, yPosition, pageWidth - 14, yPosition);
+    yPosition += 10;
+    
+    // Totaux
+    doc.setFontSize(11);
+    doc.text(`Sous-total (${orderData.items.reduce((acc, item) => acc + item.quantity, 0)} articles):`, 14, yPosition);
+    doc.text(`${formatPrice(orderData.subtotal)} FCFA`, 180, yPosition, { align: 'right' });
+    
+    yPosition += 8;
+    
+    if (orderData.deliveryCost > 0) {
+        doc.text(`Frais de livraison:`, 14, yPosition);
+        doc.text(`${formatPrice(orderData.deliveryCost)} FCFA`, 180, yPosition, { align: 'right' });
+        yPosition += 8;
+    }
+    
+    // Ligne de total
+    yPosition += 5;
+    doc.setDrawColor(...primaryColor);
+    doc.line(140, yPosition, pageWidth - 14, yPosition);
+    yPosition += 8;
+    
+    doc.setFontSize(12);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(...primaryColor);
+    doc.text('TOTAL:', 14, yPosition);
+    doc.text(`${formatPrice(orderData.total)} FCFA`, 180, yPosition, { align: 'right' });
+    
+    // Image de signature ou rejet
+    yPosition += 30;
+    
+    if (isCompleted) {
+        // Signature pour commande validée
+        try {
+            doc.addImage('https://i.postimg.cc/hjj2Tg3D/Captur-ERGVERGe.png', 'PNG', pageWidth - 60, yPosition, 40, 20);
+            doc.setFontSize(10);
+            doc.setTextColor(...secondaryColor);
+            doc.text('Signature', pageWidth - 40, yPosition + 25, { align: 'center' });
+        } catch (e) {
+            console.log("Erreur de chargement de l'image de signature");
+        }
+    } else {
+        // Image pour commande rejetée
+        try {
+            doc.addImage('https://i.postimg.cc/0NhhGMvc/pons-pneus-muret-midi-pyrenees-siligom-pneus-pas-cher-michelin-continental-AMBI-PNEUS-HD.webp', 'WEBP', pageWidth / 2 - 25, yPosition, 50, 25);
+            doc.setFontSize(10);
+            doc.setTextColor(200, 60, 60);
+            doc.text('COMMANDE REJETÉE', pageWidth / 2, yPosition + 30, { align: 'center' });
+        } catch (e) {
+            console.log("Erreur de chargement de l'image de rejet");
+        }
+    }
+    
+    // Pied de page
+    yPosition = 270;
+    doc.setFontSize(9);
+    doc.setTextColor(...secondaryColor);
+    doc.setFont(undefined, 'normal');
+    doc.text('Merci pour votre confiance!', pageWidth / 2, yPosition, { align: 'center' });
+    yPosition += 5;
+    doc.text('Service Client: +221 77 123 45 67', pageWidth / 2, yPosition, { align: 'center' });
+    yPosition += 5;
+    doc.text('www.souhaiboutelecom.com', pageWidth / 2, yPosition, { align: 'center' });
+    
+    // Sauvegarder le PDF
+    const fileName = isCompleted ? `Facture_${orderData.id}.pdf` : `Commande_Rejetee_${orderData.id}.pdf`;
+    doc.save(fileName);
+}
+
+ 
