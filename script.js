@@ -2265,33 +2265,61 @@ document.getElementById('download-facture').addEventListener('click', function()
 
 async function validateOrder(orderId) {
     try {
-        // Vérifier si la commande existe
-        const orderDoc = await db.collection('orders').doc(orderId).get();
-        if (!orderDoc.exists) {
+        // Vérifier si la commande existe en cherchant par son ID personnalisé
+        const ordersQuery = await db.collection('orders')
+            .where('id', '==', orderId)
+            .get();
+
+        if (ordersQuery.empty) {
             showNotification('Commande non trouvée', 'error');
             return;
         }
 
-        // Mettre à jour le statut de la commande
-        await db.collection('orders').doc(orderId).update({
+        // Récupérer le premier document correspondant (normalement il n'y en a qu'un)
+        const orderDoc = ordersQuery.docs[0];
+        
+        // Mettre à jour le statut de la commande en utilisant l'ID Firestore
+        await db.collection('orders').doc(orderDoc.id).update({
             status: 'completed',
             processedAt: firebase.firestore.FieldValue.serverTimestamp()
         });
 
-        // Générer la facture
-        const orderData = orderDoc.data();
-        const orderNumber = showFacture(orderData, {
-            name: orderData.customerName,
-            phone: orderData.customerPhone,
-            email: orderData.customerEmail,
-            address: orderData.customerAddress
-        });
-
         showNotification('Commande validée avec succès', 'success');
-        loadPendingOrders(); // Recharger la liste des commandes en attente
+        loadPendingOrders(); // Recharger la liste
     } catch (error) {
         console.error('Erreur lors de la validation de la commande:', error);
         showNotification('Erreur lors de la validation de la commande', 'error');
+    }
+}
+
+async function rejectOrder(orderId) {
+    if (!confirm('Voulez-vous vraiment rejeter cette commande ?')) return;
+
+    try {
+        // Vérifier si la commande existe en cherchant par son ID personnalisé
+        const ordersQuery = await db.collection('orders')
+            .where('id', '==', orderId)
+            .get();
+
+        if (ordersQuery.empty) {
+            showNotification('Commande non trouvée', 'error');
+            return;
+        }
+
+        // Récupérer le premier document correspondant
+        const orderDoc = ordersQuery.docs[0];
+        
+        // Mettre à jour le statut de la commande en utilisant l'ID Firestore
+        await db.collection('orders').doc(orderDoc.id).update({
+            status: 'rejected',
+            processedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        showNotification('Commande rejetée avec succès', 'success');
+        loadPendingOrders(); // Recharger la liste
+    } catch (error) {
+        console.error('Erreur lors du rejet de la commande:', error);
+        showNotification('Erreur lors du rejet de la commande', 'error');
     }
 }
 
