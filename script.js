@@ -217,7 +217,11 @@ function setupEventListeners() {
             navigateTo('home-page');
         });
     });
-    
+    // Ajoutez ce code dans votre fonction setupEventListeners() ou initApp()
+document.getElementById('checkout-form').addEventListener('submit', function(e) {
+    e.preventDefault(); // Empêche le rechargement de la page
+    processOrder(); // Appelle votre fonction de traitement de commande
+});
     // Voir plus de catégories
     document.querySelectorAll('.see-more').forEach(link => {
         link.addEventListener('click', (e) => {
@@ -2158,3 +2162,180 @@ async function validateOrder(orderId) {
         showNotification('Erreur lors de la validation de la commande', 'error');
     }
 }
+
+function processOrder() {
+    // Récupérer les données du formulaire
+    const customerName = document.getElementById('customer-name').value;
+    const customerPhone = document.getElementById('customer-phone').value;
+    const customerEmail = document.getElementById('customer-email').value;
+    const customerAddress = document.getElementById('customer-address').value;
+    
+    // Générer un numéro de commande unique
+    const orderNumber = 'CMD-' + Date.now();
+    
+    // Remplir la facture avec les informations
+    document.getElementById('facture-number').textContent = orderNumber;
+    document.getElementById('facture-client').textContent = customerName;
+    document.getElementById('facture-phone').textContent = customerPhone;
+    document.getElementById('facture-email').textContent = customerEmail || 'Non spécifié';
+    document.getElementById('facture-address').textContent = customerAddress || 'Non spécifié';
+    document.getElementById('facture-date').textContent = new Date().toLocaleString();
+    
+    // Ajouter les articles du panier
+    const factureItems = document.getElementById('facture-items');
+    factureItems.innerHTML = '';
+    
+    let total = 0;
+    cart.forEach(item => {
+        const price = item.product.salePrice || item.product.normalPrice;
+        const itemTotal = price * item.quantity;
+        total += itemTotal;
+        
+        const itemElement = document.createElement('div');
+        itemElement.className = 'facture-item';
+        itemElement.innerHTML = `
+            <img src="${item.product.images[0]}" alt="${item.product.name}" class="facture-item-image">
+            <div class="facture-item-details">
+                <h4 class="facture-item-name">${item.product.name}</h4>
+                <p class="facture-item-price">${formatPrice(price)} FCFA x ${item.quantity} = ${formatPrice(itemTotal)} FCFA</p>
+            </div>
+        `;
+        factureItems.appendChild(itemElement);
+    });
+    
+    // Afficher le total
+    document.getElementById('facture-total').innerHTML = `
+        <p>Total: ${formatPrice(total)} FCFA</p>
+    `;
+    
+    // Fermer le modal de commande
+    document.getElementById('checkout-modal').classList.add('hidden');
+    
+    // Afficher le modal de facture
+    document.getElementById('facture-modal').classList.remove('hidden');
+    
+    // Ajouter l'écouteur pour le bouton de téléchargement
+    document.getElementById('download-facture').addEventListener('click', downloadFacture);
+}
+
+
+
+// ==================== GESTION DE LA FACTURE ====================
+
+// Écouter la soumission du formulaire de commande
+document.getElementById('checkout-form').addEventListener('submit', function(e) {
+    e.preventDefault(); // Empêche le rechargement de la page
+    processOrder(); // Traite la commande
+});
+
+// Fonction pour traiter la commande et afficher la facture
+function processOrder() {
+    // Récupérer les valeurs du formulaire
+    const customerName = document.getElementById('customer-name').value;
+    const customerPhone = document.getElementById('customer-phone').value;
+    const customerEmail = document.getElementById('customer-email').value;
+    const customerAddress = document.getElementById('customer-address').value;
+    
+    // Valider le numéro de téléphone (obligatoire)
+    if (!customerPhone) {
+        showNotification('Le numéro de téléphone est obligatoire', 'error');
+        return;
+    }
+    
+    // Générer un numéro de commande
+    const orderNumber = 'CMD-' + Math.floor(100000 + Math.random() * 900000);
+    
+    // Remplir la facture avec les informations
+    document.getElementById('facture-number').textContent = orderNumber;
+    document.getElementById('facture-client').textContent = customerName || 'Non spécifié';
+    document.getElementById('facture-phone').textContent = customerPhone;
+    document.getElementById('facture-email').textContent = customerEmail || 'Non spécifié';
+    document.getElementById('facture-address').textContent = customerAddress || 'Non spécifié';
+    document.getElementById('facture-date').textContent = new Date().toLocaleString('fr-FR');
+    
+    // Ajouter les articles du panier à la facture
+    const factureItems = document.getElementById('facture-items');
+    factureItems.innerHTML = '';
+    
+    let total = 0;
+    cart.forEach(item => {
+        const price = item.product.salePrice || item.product.normalPrice;
+        const itemTotal = price * item.quantity;
+        total += itemTotal;
+        
+        const itemElement = document.createElement('div');
+        itemElement.className = 'facture-item';
+        itemElement.innerHTML = `
+            <img src="${item.product.images[0]}" alt="${item.product.name}" class="facture-item-image">
+            <div class="facture-item-details">
+                <h4 class="facture-item-name">${item.product.name}</h4>
+                <p class="facture-item-price">${formatPrice(price)} FCFA x ${item.quantity} = ${formatPrice(itemTotal)} FCFA</p>
+            </div>
+        `;
+        factureItems.appendChild(itemElement);
+    });
+    
+    // Afficher le total
+    document.getElementById('facture-total').innerHTML = `
+        <p><strong>Total: ${formatPrice(total)} FCFA</strong></p>
+    `;
+    
+    // Fermer le modal de commande
+    document.getElementById('checkout-modal').classList.add('hidden');
+    
+    // Afficher le modal de facture
+    document.getElementById('facture-modal').classList.remove('hidden');
+    
+    // Sauvegarder la commande
+    saveOrder(orderNumber, customerName, customerPhone, customerEmail, customerAddress, total);
+}
+
+// Fonction pour sauvegarder la commande
+function saveOrder(orderNumber, name, phone, email, address, total) {
+    const order = {
+        id: orderNumber,
+        date: new Date(),
+        customerName: name,
+        customerPhone: phone,
+        customerEmail: email,
+        customerAddress: address,
+        items: cart,
+        total: total,
+        status: 'pending'
+    };
+    
+    // Ajouter à l'historique local
+    orders.push(order);
+    localStorage.setItem('orders', JSON.stringify(orders));
+    
+    // Envoyer à Firebase (si en ligne)
+    if (navigator.onLine) {
+        try {
+            db.collection('orders').add(order);
+        } catch (error) {
+            console.error('Erreur enregistrement Firebase:', error);
+        }
+    }
+    
+    // Vider le panier
+    cart = [];
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartCount();
+}
+
+// Télécharger la facture
+document.getElementById('download-facture').addEventListener('click', function() {
+    // Utiliser html2canvas pour capturer la facture
+    html2canvas(document.querySelector('.facture-content')).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `facture-${document.getElementById('facture-number').textContent}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    });
+});
+
+// Fermer la facture
+document.querySelector('.close-facture').addEventListener('click', function() {
+    document.getElementById('facture-modal').classList.add('hidden');
+    navigateTo('home-page');
+});
