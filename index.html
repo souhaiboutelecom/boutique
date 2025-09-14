@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-    <title>SOUAIBOU TÉLÉCOM - Vente tous appareil Apple et accessoires</title>
+    <title>SOUHAIBOU TÉLÉCOM  </title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -26,12 +26,10 @@
             <div class="logo-container">
                 <img src="https://i.supaimg.com/b4a44dc2-c78a-45ff-a93b-dd14e4249939.jpg" alt="SOUAIBOU TÉLÉCOM" class="logo">
                 <div class="brand-text">
-                    <h1>SOUAIBOU TÉLÉCOM</h1>
-                    <p>Vente tous appareil Apple et accessoires</p>
                 </div>
             </div>
             <div class="search-container">
-                <input type="text" id="search-input" placeholder="Rechercher un produit...">
+                <input type="text" id="search-input" placeholder="Rechercher sur SOUAIBOU TÉLÉCOM...">
                 <button id="search-btn"><i class="fas fa-search"></i></button>
             </div>
             <!-- Champ de mot de passe admin caché -->
@@ -480,48 +478,42 @@
         </div>
 
         <!-- Facture -->
-        <div id="invoice-modal" class="modal hidden">
-            <div class="modal-content invoice">
-                <button class="close-modal">&times;</button>
-                <div class="invoice-header">
-                    <img src="https://i.supaimg.com/b4a44dc2-c78a-45ff-a93b-dd14e4249939.jpg" alt="SOUAIBOU TÉLÉCOM" class="invoice-logo">
-                    <div class="invoice-title">
-                        <h2>SOUAIBOU TÉLÉCOM</h2>
-                        <p>Vente tous appareil Apple et accessoires</p>
-                    </div>
-                </div>
-                <div class="invoice-details">
-                    <p><strong>Commande N°:</strong> <span id="invoice-number"></span></p>
-                    <p><strong>Client:</strong> <span id="invoice-customer"></span></p>
-                    <p><strong>Téléphone:</strong> <span id="invoice-phone"></span></p>
-                    <p><strong>Email:</strong> <span id="invoice-email"></span></p>
-                    <p><strong>Adresse:</strong> <span id="invoice-address"></span></p>
-                    <p><strong>Date:</strong> <span id="invoice-date"></span></p>
-                </div>
-                <div class="invoice-items">
-                    <h3>Articles commandés</h3>
-                    <table id="invoice-items-table">
-                        <thead>
-                            <tr>
-                                <th>Produit</th>
-                                <th>Quantité</th>
-                                <th>Prix</th>
-                                <th>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Articles ajoutés dynamiquement -->
-                        </tbody>
-                    </table>
-                </div>
-                <div class="invoice-total">
-                    <p><strong>Total TTC:</strong> <span id="invoice-total"></span> FCFA</p>
-                </div>
-                <div class="invoice-footer">
-                    <p>Faites une capture pour garder cette page.</p>
-                </div>
+     <!-- Ajoutez ceci dans votre HTML, de préférence à la fin du body -->
+<!-- Ce code doit être dans votre HTML principal, pas dans une nouvelle page -->
+<div id="facture-modal" class="facture-modal hidden">
+    <div class="facture-content">
+        <button class="close-facture">&times;</button>
+        <div class="facture-header">
+            <img src="https://i.supaimg.com/b4a44dc2-c78a-45ff-a93b-dd14e4249939.jpg" alt="Logo" class="facture-logo">
+            <div class="facture-title">
+                <h2>SOUHAIBOU TÉLÉCOM</h2>
+                <p>Vente tous appareil Apple et accessoires</p>
             </div>
         </div>
+        
+        <div class="facture-info">
+            <p><strong>Commande N°:</strong> <span id="facture-number"></span></p>
+            <p><strong>Client:</strong> <span id="facture-client"></span></p>
+            <p><strong>Téléphone:</strong> <span id="facture-phone"></span></p>
+            <p><strong>Email:</strong> <span id="facture-email"></span></p>
+            <p><strong>Adresse:</strong> <span id="facture-address"></span></p>
+            <p><strong>Date et heure:</strong> <span id="facture-date"></span></p>
+        </div>
+        
+        <div class="facture-items" id="facture-items">
+            <!-- Les articles seront ajoutés ici dynamiquement -->
+        </div>
+        
+        <div class="facture-total" id="facture-total">
+            <!-- Le total sera ajouté ici dynamiquement -->
+        </div>
+        
+        <div class="facture-footer">
+            <p>Faite une capture pour garder cette page.</p>
+            <button class="download-facture-btn" id="download-facture">Télécharger la facture</button>
+        </div>
+    </div>
+</div>
 
         <!-- Modal d'image plein écran -->
         <div id="image-modal" class="modal hidden">
