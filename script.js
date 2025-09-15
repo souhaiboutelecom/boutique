@@ -3209,67 +3209,78 @@ function showFacture(orderData) {
 function generatePDF(orderData) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    
-    // Styles
+
+    // Couleurs
     const primaryColor = '#1428A0';
     const secondaryColor = '#666';
-    
-    // En-tête
+    const successColor = [0, 128, 0]; // Vert
+
+    // --- Logo ---
+    doc.addImage("https://i.postimg.cc/zfFnPwZT/images.jpg", "JPEG", 10, 5, 30, 30);
+
+    // --- En-tête ---
     doc.setFillColor(20, 40, 160);
     doc.rect(0, 0, 210, 40, 'F');
     doc.setFontSize(20);
     doc.setTextColor(255, 255, 255);
-    doc.text('SOUHAIBOU TÉLÉCOM', 105, 15, { align: 'center' });
+    doc.text('SOUHAIBOU TÉLÉCOM', 130, 15, { align: 'center' });
     doc.setFontSize(12);
-    doc.text('Excellence en Électronique & Accessoires', 105, 25, { align: 'center' });
-    
-    // Numéro de facture
+    doc.text('Excellence en Électronique & Accessoires', 130, 25, { align: 'center' });
+
+    // --- Gros titre succès ---
+    doc.setDrawColor(successColor[0], successColor[1], successColor[2]);
+    doc.setLineWidth(0.8);
+    doc.roundedRect(15, 45, 180, 15, 3, 3); // cadre arrondi
+    doc.setFontSize(14);
+    doc.setTextColor(successColor[0], successColor[1], successColor[2]);
+    doc.text('COMMANDE SOUMIS AVEC SUCCÈS', 105, 55, { align: 'center' });
+
+    // --- Numéro de commande ---
     doc.setFontSize(10);
-    doc.setTextColor(255, 255, 255);
-    doc.text(`Facture N°: ST${Date.now().toString().slice(-6)}`, 15, 35);
-    
-    // Informations client
-    doc.setFontSize(12);
     doc.setTextColor(0, 0, 0);
-    doc.text('INFORMATIONS CLIENT', 15, 50);
-    doc.setDrawColor(20, 40, 160);
-    doc.line(15, 52, 80, 52);
-    
-    doc.setFontSize(10);
-    doc.text(`Client: ${orderData.name || 'Non spécifié'}`, 15, 60);
-    doc.text(`Téléphone: ${orderData.phone || 'Non spécifié'}`, 15, 65);
-    doc.text(`Email: ${orderData.email || 'Non spécifié'}`, 15, 70);
-    doc.text(`Adresse: ${orderData.address || 'Non spécifié'}`, 15, 75);
-    doc.text(`Date: ${new Date().toLocaleDateString('fr-FR')}`, 15, 80);
-    
-    // Articles
-    let yPosition = 90;
+    const orderId = `ST${Date.now().toString().slice(-6)}`;
+    doc.text(`Commande N°: ${orderId}`, 15, 70);
+
+    // --- Infos client ---
+  doc.setFontSize(12);
+doc.text('INFORMATIONS CLIENT', 130, 80); // déplacé à droite
+doc.setDrawColor(20, 40, 160);
+doc.line(130, 82, 200, 82); // ligne déplacée à droite
+
+doc.setFontSize(10);
+doc.text(`Client: ${orderData.name || 'Non spécifié'}`, 130, 90);
+doc.text(`Téléphone: ${orderData.phone || 'Non spécifié'}`, 130, 95);
+doc.text(`Email: ${orderData.email || 'Non spécifié'}`, 130, 100);
+doc.text(`Adresse: ${orderData.address || 'Non spécifié'}`, 130, 105);
+doc.text(`Date: ${new Date().toLocaleDateString('fr-FR')}`, 130, 110);
+
+
+    // --- Articles ---
+    let yPosition = 120;
     doc.setFontSize(12);
-    doc.setTextColor(0, 0, 0);
     doc.text('ARTICLES COMMANDÉS', 15, yPosition);
     doc.line(15, yPosition + 2, 80, yPosition + 2);
     yPosition += 10;
-    
+
     doc.setFontSize(10);
-    orderData.items.forEach((item, index) => {
+    orderData.items.forEach((item) => {
         if (yPosition > 250) {
             doc.addPage();
             yPosition = 20;
         }
-        
         const itemTotal = item.price * item.quantity;
         doc.text(`${item.name}`, 15, yPosition);
         doc.text(`${item.quantity} x ${item.price.toLocaleString()} FCFA`, 150, yPosition);
         doc.text(`${itemTotal.toLocaleString()} FCFA`, 180, yPosition);
         yPosition += 5;
     });
-    
-    // Totaux
+
+    // --- Totaux ---
     yPosition += 10;
     const subtotal = orderData.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const deliveryCost = orderData.deliveryCost || 0;
     const total = subtotal + deliveryCost;
-    
+
     doc.setFontSize(10);
     doc.text(`Sous-total: ${subtotal.toLocaleString()} FCFA`, 150, yPosition);
     yPosition += 5;
@@ -3278,15 +3289,15 @@ function generatePDF(orderData) {
     doc.setFontSize(12);
     doc.setFont(undefined, 'bold');
     doc.text(`TOTAL: ${total.toLocaleString()} FCFA`, 150, yPosition);
-    
-    // Pied de page
+
+    // --- Pied de page ---
     doc.setFontSize(8);
     doc.setTextColor(secondaryColor);
     doc.text('Merci pour votre confiance !', 105, 280, { align: 'center' });
-    doc.text('Service Client: +221 77 123 45 67', 105, 285, { align: 'center' });
-    
-    // Sauvegarder le PDF
-    doc.save(`facture-ST${Date.now().toString().slice(-6)}.pdf`);
+    doc.text('Service Client: +221 77 45 67', 105, 285, { align: 'center' });
+
+    // --- Sauvegarde du fichier ---
+    doc.save(`reçu-de-validation-${orderId}.pdf`);
 }
 
 // Événements
