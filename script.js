@@ -3093,16 +3093,7 @@ function saveOrder(orderNumber, name, phone, email, address, deliveryOption, del
     updateCartCount();
 }
 
-// Télécharger la facture
-document.getElementById('download-facture').addEventListener('click', function() {
-    // Utiliser html2canvas pour capturer la facture
-    html2canvas(document.querySelector('.facture-content')).then(canvas => {
-        const link = document.createElement('a');
-        link.download = `facture-${document.getElementById('facture-number').textContent}.png`;
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-    });
-});
+ 
 
 // Fermer la facture
 document.querySelector('.close-facture').addEventListener('click', function() {
