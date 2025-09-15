@@ -555,23 +555,11 @@
             <div class="modal-content">
                 <button class="close-modal">&times;</button>
                 <h2>Finaliser votre commande</h2>
-                <form id="checkout-form">
-                    <div class="form-group">
-                        <label for="customer-name">Nom complet</label>
-                        <input type="text" id="customer-name" name="name">
-                    </div>
-                    <div class="form-group">
-                        <label for="customer-phone">Numéro de téléphone *</label>
-                        <input type="tel" id="customer-phone" name="phone" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="customer-email">Email</label>
-                        <input type="email" id="customer-email" name="email">
-                    </div>
-                    <div class="form-group">
-                        <label for="customer-address">Adresse</label>
-                        <textarea id="customer-address" name="address" rows="3"></textarea>
-                    </div>
+               <form id="checkout-form">
+    <input type="text" id="customer-name" placeholder="Nom complet" required>
+    <input type="tel" id="customer-phone" placeholder="Numéro de téléphone" required>
+    <input type="email" id="customer-email" placeholder="Email (optionnel)">
+    <textarea id="customer-address" placeholder="Adresse de livraison" required></textarea>
                     <button type="submit" class="submit-btn">Confirmer la commande</button>
                 </form>
             </div>
@@ -707,18 +695,16 @@
             <i class="fas fa-home"></i>
             <span>Accueil</span>
         </a>
-        <a href="#" class="nav-item" data-page="category-page">
-            <i class="fas fa-list"></i>
-            <span>Catégories</span>
+        
+       
+        <a href="#" class="nav-item" data-page="favorites-page">
+            <i class="fas fa-heart"></i>
+            <span>Favoris</span>
         </a>
         <a href="#" class="nav-item" data-page="cart-page">
             <i class="fas fa-shopping-cart"></i>
             <span>Panier</span>
             <span id="cart-count" class="badge hidden">0</span>
-        </a>
-        <a href="#" class="nav-item" data-page="favorites-page">
-            <i class="fas fa-heart"></i>
-            <span>Favoris</span>
         </a>
         <a href="#" class="nav-item" data-page="contact-page">
             <i class="fas fa-phone"></i>
