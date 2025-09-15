@@ -3636,4 +3636,133 @@ function generateFacturePDF(orderData, status) {
     doc.save(fileName);
 }
 
- 
+ // Navigation vers la page personnelle
+document.querySelector('[data-page="personal-page"]').addEventListener('click', (e) => {
+    e.preventDefault();
+    navigateTo('personal-page');
+    loadPersonalPage();
+});
+
+// Chargement de la page personnelle
+function loadPersonalPage() {
+    loadProfileData();
+    loadPersonalOrderHistory();
+    setupFactureSearch();
+}
+
+// Charger les données du profil
+function loadProfileData() {
+    const profile = JSON.parse(localStorage.getItem('userProfile')) || {};
+    document.getElementById('profile-name').value = profile.name || '';
+    document.getElementById('profile-phone').value = profile.phone || '';
+    document.getElementById('profile-email').value = profile.email || '';
+    document.getElementById('profile-address').value = profile.address || '';
+    
+    if (profile.photo) {
+        document.getElementById('profile-image').src = profile.photo;
+    }
+}
+
+// Sauvegarder les données du profil
+document.getElementById('save-profile-btn').addEventListener('click', () => {
+    const profile = {
+        name: document.getElementById('profile-name').value,
+        phone: document.getElementById('profile-phone').value,
+        email: document.getElementById('profile-email').value,
+        address: document.getElementById('profile-address').value,
+        photo: document.getElementById('profile-image').src
+    };
+    
+    localStorage.setItem('userProfile', JSON.stringify(profile));
+    showNotification('Profil enregistré avec succès', 'success');
+});
+
+// Changer la photo de profil
+document.getElementById('change-photo-btn').addEventListener('click', () => {
+    document.getElementById('profile-upload').click();
+});
+
+document.getElementById('profile-upload').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            document.getElementById('profile-image').src = event.target.result;
+            
+            // Sauvegarder automatiquement
+            const profile = JSON.parse(localStorage.getItem('userProfile')) || {};
+            profile.photo = event.target.result;
+            localStorage.setItem('userProfile', JSON.stringify(profile));
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+// Charger l'historique des commandes dans la page personnelle
+function loadPersonalOrderHistory() {
+    const historyContainer = document.getElementById('personal-order-history');
+    const savedOrders = localStorage.getItem('orders');
+    
+    if (savedOrders) {
+        const orders = JSON.parse(savedOrders);
+        
+        if (orders.length === 0) {
+            historyContainer.innerHTML = '<p class="no-orders">Aucune commande dans l\'historique</p>';
+            return;
+        }
+        
+        // Trier les commandes par date (du plus récent au plus ancien)
+        orders.sort((a, b) => new Date(b.date) - new Date(a.date));
+        
+        // Afficher les commandes
+        historyContainer.innerHTML = '';
+        orders.forEach(order => {
+            const orderElement = createPersonalOrderItem(order);
+            historyContainer.appendChild(orderElement);
+        });
+    } else {
+        historyContainer.innerHTML = '<p class="no-orders">Aucune commande dans l\'historique</p>';
+    }
+}
+
+// Créer un élément de commande pour la page personnelle
+function createPersonalOrderItem(order) {
+    const orderDate = new Date(order.date);
+    const formattedDate = orderDate.toLocaleDateString('fr-FR');
+    
+    const orderItem = document.createElement('div');
+    orderItem.className = 'personal-order-item';
+    orderItem.innerHTML = `
+        <div class="personal-order-header">
+            <span class="order-number">${order.id}</span>
+            <span class="order-date">${formattedDate}</span>
+            <span class="order-status ${order.status}">${order.status === 'completed' ? 'Validée' : 
+                 order.status === 'rejected' ? 'Rejetée' : 'En attente'}</span>
+        </div>
+        <div class="personal-order-total">Total: ${formatPrice(order.total)} FCFA</div>
+        <button class="view-order-details" data-order-id="${order.id}">
+            <i class="fas fa-eye"></i> Détails
+        </button>
+    `;
+    
+    orderItem.querySelector('.view-order-details').addEventListener('click', () => {
+        showOrderDetails(order);
+    });
+    
+    return orderItem;
+}
+
+// Configuration de la recherche de facture dans la page personnelle
+function setupFactureSearch() {
+    document.getElementById('personal-facture-btn').addEventListener('click', () => {
+        const orderNumber = document.getElementById('personal-facture-input').value.trim().toUpperCase();
+        searchFacture(orderNumber, 'personal-facture-result');
+    });
+    
+    document.getElementById('personal-facture-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            const orderNumber = document.getElementById('personal-facture-input').value.trim().toUpperCase();
+            searchFacture(orderNumber, 'personal-facture-result');
+        }
+    });
+}
