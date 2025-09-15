@@ -7,7 +7,7 @@
 }
 
 body {
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Poppins', sans-serif;
     background-color: #ffffff;
     color: #333;
     line-height: 1.6;
@@ -204,11 +204,11 @@ body {
 }
 
 .category-bar.blue {
-    background-color: #1428A0;
+    background-color: #223088;
 }
 
 .category-bar.red {
-    background-color: #FF0000;
+    background-color: #af3131;
 }
 
 .category-bar.light-blue {
@@ -769,8 +769,8 @@ body {
 .admin-menu {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    margin-bottom: 20px;
+    gap: 2px; /* réduit l'espace entre boutons */
+    margin-bottom: 10px;
 }
 
 .admin-btn {
@@ -778,34 +778,36 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 15px 10px;
+    padding: 2px 2px;  
     background-color: #f8f9fa;
     border: 1px solid #ddd;
-    border-radius: 8px;
+    border-radius: 3px; 
     cursor: pointer;
     text-align: center;
+    min-width: 20px;
+    min-height: 20px;  /* hauteur minimum */
 }
 
 .admin-btn i {
-    font-size: 24px;
-    margin-bottom: 10px;
+    font-size: 16px; /* icône plus petite */
+    margin-bottom: 3px;
     color: #D4AF37;
 }
 
 .admin-btn span {
-    font-size: 12px;
+    font-size: 10px; /* texte plus petit */
     font-weight: 500;
 }
 
 .admin-view {
     background-color: #f8f9fa;
-    padding: 15px;
-    border-radius: 8px;
+    padding: 10px;
+    border-radius: 5px;
 }
 
 .admin-view h3 {
-    font-size: 16px;
-    margin-bottom: 15px;
+    font-size: 14px;
+    margin-bottom: 10px;
     color: #333;
 }
 
@@ -2581,4 +2583,109 @@ body {
     color: #666;
     font-style: italic;
     padding: 20px;
+}
+
+
+.facture-section {
+    background: #ffff;
+    border: 1px solid #c1ab39;
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.facture-section h3 {
+    color: #000000;
+    margin-bottom: 15px;
+}
+
+.search-facture-form {
+    display: flex;
+    gap: 10px;
+}
+
+#personal-facture-input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #VOTRE_COULEUR_CHAMP;
+    border-radius: 5px;
+}
+
+#personal-facture-btn {
+    background: #VOTRE_COULEUR_BOUTON;
+    color: #VOTRE_COULEUR_TEXTE_BOUTON;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    cursor: pointer;
+}
+
+#admin-password-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: transparent;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Styles pour la page personnelle */
+.personal-content {
+    padding: 15px;
+}
+
+.profile-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.profile-picture {
+    text-align: center;
+}
+
+.profile-picture img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #1428A0;
+}
+
+#change-photo-btn {
+    margin-top: 10px;
+    padding: 8px 15px;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.profile-info {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Responsive */
+@media (min-width: 768px) {
+    .profile-section {
+        flex-direction: row;
+        align-items: flex-start;
+    }
+    
+    .profile-picture {
+        flex: 0 0 150px;
+    }
+    
+    .profile-info {
+        flex: 1;
+    }
 }
