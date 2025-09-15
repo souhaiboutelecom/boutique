@@ -3090,3 +3090,106 @@ body {
         gap: 10px;
     }
 }
+
+/* === Modal Global === */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+/* === Contenu de la fenêtre === */
+.modal-content {
+    background: #fff;
+    border-radius: 15px;
+    padding: 25px 30px;
+    width: 90%;
+    max-width: 450px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    position: relative;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* === Bouton fermer === */
+.close-modal {
+    position: absolute;
+    top: 12px;
+    right: 15px;
+    font-size: 22px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: #888;
+    transition: color 0.2s;
+}
+.close-modal:hover {
+    color: #000;
+}
+
+/* === Titre === */
+.modal-content h2 {
+    margin-bottom: 20px;
+    font-size: 22px;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+}
+
+/* === Formulaire === */
+#checkout-form input,
+#checkout-form textarea {
+    width: 100%;
+    padding: 12px 14px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    transition: border 0.2s, box-shadow 0.2s;
+}
+
+#checkout-form input:focus,
+#checkout-form textarea:focus {
+    border: 1px solid #d4af37; /* Doré */
+    box-shadow: 0 0 6px rgba(212, 175, 55, 0.5);
+}
+
+/* === Bouton Confirmer (doré chic) === */
+.submit-btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    margin-top: 15px;
+    background: linear-gradient(135deg, #FFD700, #B8860B);
+    color: #fff;
+    font-weight: bold;
+    font-size: 16px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(212, 175, 55, 0.6);
+}
