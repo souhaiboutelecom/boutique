@@ -3249,7 +3249,7 @@ doc.text(`Date: ${new Date().toLocaleDateString('fr-FR')}`, 130, 110);
     // --- Articles ---
     let yPosition = 120;
     doc.setFontSize(12);
-    doc.text('ARTICLES COMMANDÉS', 15, yPosition);
+    doc.text('Vérifiez le statut dans votre page personnelle', 15, yPosition);
     doc.line(15, yPosition + 2, 80, yPosition + 2);
     yPosition += 10;
 
@@ -3266,26 +3266,13 @@ doc.text(`Date: ${new Date().toLocaleDateString('fr-FR')}`, 130, 110);
         yPosition += 5;
     });
 
-    // --- Totaux ---
-    yPosition += 10;
-    const subtotal = orderData.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const deliveryCost = orderData.deliveryCost || 0;
-    const total = subtotal + deliveryCost;
-
-    doc.setFontSize(10);
-    doc.text(`Sous-total: ${subtotal.toLocaleString()} FCFA`, 150, yPosition);
-    yPosition += 5;
-    doc.text(`Livraison: ${deliveryCost.toLocaleString()} FCFA`, 150, yPosition);
-    yPosition += 5;
-    doc.setFontSize(12);
-    doc.setFont(undefined, 'bold');
-    doc.text(`TOTAL: ${total.toLocaleString()} FCFA`, 150, yPosition);
+    
 
     // --- Pied de page ---
     doc.setFontSize(8);
     doc.setTextColor(secondaryColor);
     doc.text('Merci pour votre confiance !', 105, 280, { align: 'center' });
-    doc.text('Service Client: +221 77 45 67', 105, 285, { align: 'center' });
+    doc.text('Service Client: +221 77 235 33 33 - 78 835 33 33 - 77 295 21 29 - 77 753 13 13', 105, 285, { align: 'center' });
 
     // --- Sauvegarde du fichier ---
     doc.save(`reçu-de-validation-${orderId}.pdf`);
