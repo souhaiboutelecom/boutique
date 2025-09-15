@@ -245,10 +245,7 @@
                     </div>
                     <button id="checkout-btn" class="checkout-btn">Valider ma commande</button>
                 </div>
-                <div class="order-history">
-                    <h3>Historique des commandes</h3>
-                    <button id="view-history-btn">Voir</button>
-                </div>
+                
             </div>
         </section>
 
@@ -359,24 +356,16 @@
         </div>
         
         <!-- Section Recherche de Facture -->
-        <div class="facture-card">
-            <h3><i class="fas fa-receipt"></i> Obtenir ma facture</h3>
-            <p class="card-description">Entrez votre numéro de commande pour télécharger votre facture</p>
-            
-            <div class="search-facture-form">
-                <div class="search-input-container">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" id="personal-facture-input" placeholder="Ex: ST685010, ST-685010 ou 685010">
-                </div>
-                <button id="personal-facture-btn" class="modern-btn">
-                    <i class="fas fa-download"></i> Rechercher
-                </button>
-            </div>
-            
-            <div id="personal-facture-result" class="hidden">
-                <!-- Résultats de recherche -->
-            </div>
-        </div>
+      <div class="facture-search-section">
+    <h3><i class="fas fa-receipt"></i> OBTENIR MA FACTURE MAINTENANT</h3>
+    <div class="search-facture-form">
+        <input type="text" id="personal-facture-input" placeholder="Entrez votre numéro de commande (ex: ST685010 ou ST-685010)">
+        <button id="personal-facture-btn"><i class="fas fa-search"></i> Rechercher</button>
+    </div>
+    <div id="personal-facture-result" class="hidden">
+        <!-- Les résultats de recherche s'afficheront ici -->
+    </div>
+</div>
         
         <!-- Section Historique des Commandes -->
         <div class="history-card">
