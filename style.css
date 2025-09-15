@@ -3237,3 +3237,10 @@ body {
 }
 .category a { display: block; width: 100%; height: 100%; }
  
+
+.profile-image {
+    border-radius: 50%; /* Forme ronde */
+    object-fit: cover; /* Évite la déformation de l'image */
+    width: 100px; /* Ajustez la taille */
+    height: 100px;
+}
