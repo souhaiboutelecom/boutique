@@ -3701,18 +3701,32 @@ document.getElementById('profile-upload').addEventListener('change', (e) => {
 // Charger l'historique des commandes dans la page personnelle
 function loadPersonalOrderHistory() {
     const historyContainer = document.getElementById('personal-order-history');
+    const ordersCountElement = document.getElementById('orders-count');
     const savedOrders = localStorage.getItem('orders');
     
     if (savedOrders) {
         const orders = JSON.parse(savedOrders);
         
+        // Mettre à jour le compteur de commandes
+        ordersCountElement.textContent = `${orders.length} commande(s)`;
+        
         if (orders.length === 0) {
-            historyContainer.innerHTML = '<p class="no-orders">Aucune commande dans l\'historique</p>';
+            historyContainer.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-shopping-bag"></i>
+                    <p>Aucune commande effectuée</p>
+                </div>
+            `;
             return;
         }
         
         // Trier les commandes par date (du plus récent au plus ancien)
-        orders.sort((a, b) => new Date(b.date) - new Date(a.date));
+        orders.sort((a, b) => {
+            // Gérer à la fois les dates sous forme de string et d'objet Firebase Timestamp
+            const dateA = a.date && a.date.seconds ? new Date(a.date.seconds * 1000) : new Date(a.date);
+            const dateB = b.date && b.date.seconds ? new Date(b.date.seconds * 1000) : new Date(b.date);
+            return dateB - dateA;
+        });
         
         // Afficher les commandes
         historyContainer.innerHTML = '';
@@ -3721,9 +3735,16 @@ function loadPersonalOrderHistory() {
             historyContainer.appendChild(orderElement);
         });
     } else {
-        historyContainer.innerHTML = '<p class="no-orders">Aucune commande dans l\'historique</p>';
+        ordersCountElement.textContent = '0 commande(s)';
+        historyContainer.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-shopping-bag"></i>
+                <p>Aucune commande effectuée</p>
+            </div>
+        `;
     }
 }
+
 
 // Créer un élément de commande pour la page personnelle
 function createPersonalOrderItem(order) {
@@ -3733,12 +3754,15 @@ function createPersonalOrderItem(order) {
     const orderItem = document.createElement('div');
     orderItem.className = 'personal-order-item';
     orderItem.innerHTML = `
-        <div class="personal-order-header">
-            <span class="order-number">${order.id}</span>
-            <span class="order-date">${formattedDate}</span>
-            <span class="order-status ${order.status}">${order.status === 'completed' ? 'Validée' : 
-                 order.status === 'rejected' ? 'Rejetée' : 'En attente'}</span>
-        </div>
+       <div class="personal-order-header">
+    <span class="order-number">
+        <b>Commande N°:</b> ${order.id}
+    </span>
+    <span class="order-date">
+        <b>Date :</b> ${formattedDate}
+    </span>
+</div>
+
         <div class="personal-order-total">Total: ${formatPrice(order.total)} FCFA</div>
         <button class="view-order-details" data-order-id="${order.id}">
             <i class="fas fa-eye"></i> Détails
