@@ -2321,7 +2321,7 @@ function generateFacturePDF(orderNumber, customerInfo) {
     doc.setFont(undefined, 'normal');
     doc.text('Merci pour votre confiance!', 105, yPosition, { align: 'center' });
     yPosition += 5;
-    doc.text('Service Client: +221 77 123 45 67', 105, yPosition, { align: 'center' });
+    doc.text('Service Client: +221 77 235 33 33 - 78 835 33 33 - 77 295 21 29 - 77 753 13 13', 105, yPosition, { align: 'center' });
     yPosition += 5;
     doc.text('www.souhaiboutelecom.com', 105, yPosition, { align: 'center' });
     
@@ -2734,12 +2734,12 @@ function generateReceiptPDF(order) {
     doc.setTextColor(100, 100, 100);
     doc.text('Reçu de commande', pageWidth / 2, 28, { align: 'center' });
     
-    // Informations de la commande
+    // Informations de la co mmande
     doc.setFontSize(10);
     doc.setTextColor(0, 0, 0);
     doc.text(`N° de commande: ${order.id}`, 20, 40);
     doc.text(`Date: ${new Date(order.date).toLocaleDateString('fr-FR')}`, 20, 46);
-    doc.text(`Statut: ${order.status === 'completed' ? 'Validée' : order.status === 'rejected' ? 'Rejetée' : 'En attente'}`, 20, 52);
+    doc.text(`Statut: ${order.status === 'completed' ? 'Validée' : order.status === 'rejected' ? 'Rejetée' : '...'}`, 20, 52);
     
     // Informations client
     doc.text(`Client: ${order.customerName || 'Non spécifié'}`, 20, 62);
@@ -2784,7 +2784,7 @@ function generateReceiptPDF(order) {
     doc.setFontSize(8);
     doc.setTextColor(100, 100, 100);
     doc.text('Merci pour votre confiance!', pageWidth / 2, yPosition, { align: 'center' });
-    doc.text('Service Client: +221 77 123 45 67', pageWidth / 2, yPosition + 5, { align: 'center' });
+    doc.text('Service Client: +221 77 235 33 33 - 78 835 33 33 - 77 295 21 29 - 77 753 13 13', pageWidth / 2, yPosition + 5, { align: 'center' });
     
     // Sauvegarder le PDF
     doc.save(`Reçu_${order.id}.pdf`);
@@ -3654,7 +3654,7 @@ doc.text('Excellence en Électronique & Accessoires', pageWidth / 2, 35, { align
     doc.setFont(undefined, 'normal');
     doc.text('Merci pour votre confiance!', pageWidth / 2, yPosition, { align: 'center' });
     yPosition += 5;
-    doc.text('Service Client: +221 77 123 45 67', pageWidth / 2, yPosition, { align: 'center' });
+    doc.text('Service Client: +221 77 235 33 33 - 78 835 33 33 - 77 295 21 29 - 77 753 13 13', pageWidth / 2, yPosition, { align: 'center' });
     yPosition += 5;
     doc.text('www.souhaiboutelecom.com', pageWidth / 2, yPosition, { align: 'center' });
     
