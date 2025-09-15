@@ -2149,140 +2149,246 @@ body {
 
 /* ==================== STYLE RECHERCHE FACTURE ==================== */
 
-.facture-search-section {
-    background: linear-gradient(135deg, #1428A0 0%, #1E40AF 100%);
-    border-radius: 12px;
-    padding: 20px;
-    margin: 20px 0;
-    color: white;
-    box-shadow: 0 8px 25px rgba(20, 40, 160, 0.15);
-}
+    /* Styles pour la section recherche de facture */
+    .facture-search-section {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 25px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        border: 2px solid #D4AF37; /* Bordure dorée */
+        position: relative;
+        overflow: hidden;
+    }
 
-.facture-search-section h3 {
-    margin: 0 0 15px 0;
-    font-size: 18px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
+    .facture-search-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #D4AF37, #FFD700, #D4AF37);
+    }
 
-.search-facture-form {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 15px;
-}
+    .facture-search-section h3 {
+        color: #1428A0;
+        margin-bottom: 20px;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 600;
+    }
 
-#facture-search-input {
-    flex: 1;
-    padding: 12px 15px;
-    border: none;
-    border-radius: 8px;
-    font-size: 14px;
-    background: rgba(255, 255, 255, 0.95);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
+    .search-facture-form {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
 
-#facture-search-btn {
-    padding: 12px 20px;
-    background: #FF6B00;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
+    #personal-facture-input {
+        flex: 1;
+        padding: 14px 18px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        font-size: 15px;
+        transition: all 0.3s;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
 
-#facture-search-btn:hover {
-    background: #E55A00;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(255, 107, 0, 0.3);
-}
+    #personal-facture-input:focus {
+        border-color: #1428A0;
+        box-shadow: 0 0 0 3px rgba(20, 40, 160, 0.1);
+        outline: none;
+    }
 
-.facture-result {
-    background: white;
-    border-radius: 12px;
-    padding: 20px;
-    margin-top: 15px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-    border-left: 4px solid;
-}
+    #personal-facture-btn {
+        background: linear-gradient(to right, #1428A0, #1E40AF);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 0 25px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s;
+        box-shadow: 0 4px 6px rgba(20, 40, 160, 0.2);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
 
-.facture-result.completed {
-    border-left-color: #28a745;
-}
+    #personal-facture-btn:hover {
+        background: linear-gradient(to right, #1E40AF, #2C52C0);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 8px rgba(20, 40, 160, 0.25);
+    }
 
-.facture-result.rejected {
-    border-left-color: #dc3545;
-}
+    #personal-facture-btn:active {
+        transform: translateY(0);
+    }
 
-.facture-result.pending {
-    border-left-color: #ffc107;
-}
+    /* Styles pour les résultats */
+    .facture-result {
+        padding: 25px;
+        border-radius: 12px;
+        text-align: center;
+        margin-top: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border: 2px solid #e0e0e0;
+        transition: all 0.3s ease;
+    }
 
-.facture-result.error {
-    border-left-color: #6c757d;
-}
+    .facture-result.completed {
+        background: linear-gradient(to bottom right, #e8f5e9, #c8e6c9);
+        border: 2px solid #4caf50;
+        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.2);
+    }
 
-.result-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 15px;
-}
+    .facture-result.completed .result-header i {
+        color: #4caf50;
+        background: rgba(76, 175, 80, 0.1);
+        padding: 15px;
+        border-radius: 50%;
+    }
 
-.result-header i {
-    font-size: 24px;
-}
+    .facture-result.completed .result-header h4 {
+        color: #2e7d32;
+        font-weight: 700;
+    }
 
-.result-header h4 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 600;
-}
+    .facture-result.rejected {
+        background: linear-gradient(to bottom right, #ffebee, #ffcdd2);
+        border: 2px solid #f44336;
+        box-shadow: 0 4px 15px rgba(244, 67, 54, 0.2);
+    }
 
-.facture-result.completed .result-header i {
-    color: #28a745;
-}
+    .facture-result.rejected .result-header i {
+        color: #f44336;
+        background: rgba(244, 67, 54, 0.1);
+        padding: 15px;
+        border-radius: 50%;
+    }
 
-.facture-result.rejected .result-header i {
-    color: #dc3545;
-}
+    .facture-result.rejected .result-header h4 {
+        color: #c62828;
+        font-weight: 700;
+    }
 
-.result-details {
-    margin-bottom: 20px;
-}
+    .facture-result.pending {
+        background: linear-gradient(to bottom right, #fff3e0, #ffe0b2);
+        border: 2px solid #ff9800;
+        box-shadow: 0 4px 15px rgba(255, 152, 0, 0.2);
+    }
 
-.result-details p {
-    margin: 8px 0;
-    font-size: 14px;
-}
+    .facture-result.error {
+        background: linear-gradient(to bottom right, #ffebee, #ffcdd2);
+        border: 2px solid #f44336;
+        box-shadow: 0 4px 15px rgba(244, 67, 54, 0.2);
+    }
 
-.download-facture-btn {
-    width: 100%;
-    padding: 12px;
-    background: linear-gradient(135deg, #1428A0 0%, #1E40AF 100%);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
+    .facture-result.loading {
+        background: #f5f5f5;
+        border: 2px solid #ddd;
+    }
 
-.download-facture-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(20, 40, 160, 0.3);
-}
+    .result-header {
+        margin-bottom: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+    }
 
+    .result-header i {
+        font-size: 48px;
+        margin-bottom: 5px;
+    }
+
+    .result-header h4 {
+        margin: 0;
+        font-size: 22px;
+        letter-spacing: 0.5px;
+    }
+
+    .result-details {
+        text-align: left;
+        margin-bottom: 25px;
+        background: rgba(255, 255, 255, 0.7);
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .result-details p {
+        margin: 10px 0;
+        font-size: 15px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .result-details p strong {
+        color: #333;
+        min-width: 140px;
+    }
+
+    .download-facture-btn {
+        background: linear-gradient(to right, #1428A0, #1E40AF);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 14px 28px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 16px;
+        box-shadow: 0 4px 8px rgba(20, 40, 160, 0.25);
+    }
+
+    .download-facture-btn:hover {
+        background: linear-gradient(to right, #1E40AF, #2C52C0);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(20, 40, 160, 0.3);
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    /* Animation d'apparition */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .facture-result {
+        animation: fadeIn 0.4s ease-out;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .search-facture-form {
+            flex-direction: column;
+        }
+        
+        #personal-facture-btn {
+            width: 100%;
+            justify-content: center;
+            padding: 12px;
+        }
+        
+        .result-details p {
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .result-details p strong {
+            min-width: auto;
+        }
+    }
 /* ==================== STYLE RECHERCHE PRODUITS ==================== */
 
 #search-results-page .page-header {
