@@ -307,7 +307,94 @@
                 </div>
             </div>
         </section>
-
+<!-- Page Personnelle -->
+<!-- Page Personnelle - Remplacez votre section existante par ce code -->
+<section id="personal-page" class="page">
+    <div class="page-header">
+        <button class="back-btn"><i class="fas fa-arrow-left"></i></button>
+        <h2>Mon Espace Personnel</h2>
+    </div>
+    
+    <div class="personal-content">
+        <!-- Section Profil -->
+        <div class="profile-card">
+            <div class="profile-header">
+                <div class="profile-image-container">
+                    <img id="profile-image" src="https://via.placeholder.com/120" alt="Photo de profil">
+                    <label for="profile-upload" class="change-photo-btn">
+                        <i class="fas fa-camera"></i>
+                    </label>
+                    <input type="file" id="profile-upload" accept="image/*" class="hidden">
+                </div>
+                <h3 id="profile-display-name">Nom Prénom</h3>
+                <p id="profile-display-phone">77 XXX XX XX</p>
+            </div>
+            
+            <div class="profile-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="profile-name">Nom & Prénom</label>
+                        <input type="text" id="profile-name" placeholder="Votre nom complet">
+                    </div>
+                    <div class="form-group">
+                        <label for="profile-phone">Téléphone</label>
+                        <input type="tel" id="profile-phone" placeholder="77 123 45 67">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="profile-email">Email</label>
+                    <input type="email" id="profile-email" placeholder="votre@email.com">
+                </div>
+                
+                <div class="form-group">
+                    <label for="profile-address">Adresse</label>
+                    <textarea id="profile-address" rows="2" placeholder="Votre adresse complète"></textarea>
+                </div>
+                
+                <button id="save-profile-btn" class="modern-btn">
+                    <i class="fas fa-save"></i> Enregistrer
+                </button>
+            </div>
+        </div>
+        
+        <!-- Section Recherche de Facture -->
+        <div class="facture-card">
+            <h3><i class="fas fa-receipt"></i> Obtenir ma facture</h3>
+            <p class="card-description">Entrez votre numéro de commande pour télécharger votre facture</p>
+            
+            <div class="search-facture-form">
+                <div class="search-input-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="personal-facture-input" placeholder="Ex: ST685010, ST-685010 ou 685010">
+                </div>
+                <button id="personal-facture-btn" class="modern-btn">
+                    <i class="fas fa-download"></i> Rechercher
+                </button>
+            </div>
+            
+            <div id="personal-facture-result" class="hidden">
+                <!-- Résultats de recherche -->
+            </div>
+        </div>
+        
+        <!-- Section Historique des Commandes -->
+        <div class="history-card">
+            <div class="card-header">
+                <h3><i class="fas fa-history"></i> Historique des commandes</h3>
+                <span id="orders-count">0 commande(s)</span>
+            </div>
+            
+            <div id="personal-order-history" class="orders-list">
+                <!-- Commandes ajoutées dynamiquement -->
+                <div class="empty-state">
+                    <i class="fas fa-shopping-bag"></i>
+                    <p>Aucune commande effectuée</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
         <!-- Page Admin -->
         <section id="admin-page" class="page">
             <div class="page-header">
@@ -521,7 +608,7 @@
             </div>
         </div>
 
-        <!-- Informations client -->
+        <!-- Informations cliet -->
         <div class="facture-client-info">
             <div class="info-section">
                 <h3>Informations Client</h3>
@@ -648,6 +735,11 @@
             <i class="fas fa-phone"></i>
             <span>Contact</span>
         </a>
+      <!-- Ajoutez ceci dans la navigation inférieure -->
+<a href="#" class="nav-item" data-page="personal-page">
+    <i class="fas fa-user"></i>
+    <span>Mon Compte</span>
+</a>
     </nav>
 
     <!-- Notifications -->
