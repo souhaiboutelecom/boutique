@@ -3476,13 +3476,26 @@ function generateFacturePDF(orderData, status) {
     doc.setFillColor(...primaryColor);
     doc.rect(0, 0, pageWidth, 30, 'F');
     
-    // Logo et nom de l'entreprise
-    doc.setFontSize(20);
-    doc.setTextColor(255, 255, 255);
-    doc.text('SOUHAIBOU TÉLÉCOM', pageWidth / 2, 15, { align: 'center' });
-    doc.setFontSize(10);
-    doc.text('Excellence en Électronique & Accessoires', pageWidth / 2, 22, { align: 'center' });
-    
+ // En-tête avec logo
+const logoUrl = 'https://i.postimg.cc/zfFnPwZT/images.jpg';
+const logoWidth = 30;  // largeur du logo en pt
+const logoHeight = 30; // hauteur du logo en pt
+const logoX = 14;      // marge gauche
+const logoY = 5;       // un peu en dessous du bord supérieur
+
+try {
+    doc.addImage(logoUrl, 'JPEG', logoX, logoY, logoWidth, logoHeight);
+} catch (e) {
+    console.log("Erreur de chargement du logo", e);
+}
+
+// Nom de l'entreprise centré
+doc.setFontSize(20);
+doc.setTextColor(255, 255, 255);
+doc.text('SOUHAIBOU TÉLÉCOM', pageWidth / 2, 25, { align: 'center' }); // un peu plus bas pour aligner avec le logo
+doc.setFontSize(10);
+doc.text('Excellence en Électronique & Accessoires', pageWidth / 2, 35, { align: 'center' });
+
     // Numéro de facture et date
     doc.setFontSize(12);
     doc.setTextColor(...primaryColor);
