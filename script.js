@@ -1466,7 +1466,7 @@ function createOrderElement(order, status) {
     orderElement.innerHTML = `
         <div class="order-header">
             <span>Commande #${order.id.substring(0, 8)}</span>
-            <span>${new Date(order.date).toLocaleDateString()}</span>
+<span>${formatFirestoreDate(order.date)}</span>
         </div>
         <div class="order-customer">
             <p><strong>Client:</strong> ${order.customerName || 'Non spécifié'}</p>
@@ -1504,7 +1504,22 @@ function createOrderElement(order, status) {
     
     return orderElement;
 }
-
+function formatFirestoreDate(timestamp) {
+    if (!timestamp) return 'Date invalide';
+    
+    // Si c'est un objet Firestore Timestamp
+    if (timestamp.toDate) {
+        return timestamp.toDate().toLocaleDateString('fr-FR');
+    }
+    // Si c'est déjà un objet Date
+    else if (timestamp instanceof Date) {
+        return timestamp.toLocaleDateString('fr-FR');
+    }
+    // Si c'est une string
+    else {
+        return new Date(timestamp).toLocaleDateString('fr-FR');
+    }
+}
 async function validateOrder(orderId) {
     try {
         await db.collection('orders').doc(orderId).update({
