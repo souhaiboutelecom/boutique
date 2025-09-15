@@ -823,10 +823,13 @@ function renderCartPage() {
             deliverySelect.appendChild(deliveryOption);
         });
         
-        // Gestion de la validation de commande
-        document.getElementById('checkout-btn').addEventListener('click', () => {
-            document.getElementById('checkout-modal').classList.remove('hidden');
-        });
+       // Dans votre fonction renderCartPage() ou équivalent
+document.getElementById('checkout-btn').addEventListener('click', () => {
+    document.getElementById('checkout-modal').classList.remove('hidden');
+    
+    // Préremplir le formulaire avec les infos du profil
+    prefillCheckoutForm();
+});
     }
     
     // Historique des commandes
@@ -3907,5 +3910,28 @@ function displayPersonalOrderResult(orderData, resultContainer) {
         downloadBtn.addEventListener('click', () => {
             generateFacturePDF(orderData, orderData.status);
         });
+    }
+}
+
+// Fonction pour préremplir le formulaire avec les infos du profil
+function prefillCheckoutForm() {
+    // Récupérer les données du profil depuis le localStorage
+    const userProfile = JSON.parse(localStorage.getItem('userProfile')) || {};
+    
+    // Préremplir les champs du formulaire
+    if (userProfile.name) {
+        document.getElementById('customer-name').value = userProfile.name;
+    }
+    
+    if (userProfile.phone) {
+        document.getElementById('customer-phone').value = userProfile.phone;
+    }
+    
+    if (userProfile.email) {
+        document.getElementById('customer-email').value = userProfile.email;
+    }
+    
+    if (userProfile.address) {
+        document.getElementById('customer-address').value = userProfile.address;
     }
 }
