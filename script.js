@@ -1694,9 +1694,16 @@ function generateOrdersPDF(orders, type, totalSales = 0) {
             yPosition = 20;
         }
         
-        doc.setFontSize(12);
-        doc.text(`Commande #${order.id.substring(0, 8)}`, 14, yPosition);
-        doc.text(`${new Date(order.date).toLocaleDateString()}`, 180, yPosition, { align: 'right' });
+       // Récupérer la date correctement
+const orderDate = order.date?.seconds 
+    ? new Date(order.date.seconds * 1000)  // Firebase Timestamp
+    : new Date(order.date);                // Local ou string
+
+// Ajouter dans le PDF
+doc.setFontSize(12);
+doc.text(`Commande #${order.id.substring(0, 8)}`, 14, yPosition);
+doc.text(orderDate.toLocaleDateString('fr-FR'), 180, yPosition, { align: 'right' });
+
         
         yPosition += 7;
         doc.setFontSize(10);
