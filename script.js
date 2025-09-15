@@ -3647,7 +3647,7 @@ document.querySelector('[data-page="personal-page"]').addEventListener('click', 
 function loadPersonalPage() {
     loadProfileData();
     loadPersonalOrderHistory();
-    setupFactureSearch();
+    setupPersonalFactureSearch(); // Initialiser la recherche de facture
 }
 
 // Charger les données du profil
@@ -3765,4 +3765,123 @@ function setupFactureSearch() {
             searchFacture(orderNumber, 'personal-facture-result');
         }
     });
+}
+
+// Configuration de la recherche de facture dans la page personnelle
+function setupPersonalFactureSearch() {
+    const searchBtn = document.getElementById('personal-facture-btn');
+    const searchInput = document.getElementById('personal-facture-input');
+    const resultContainer = document.getElementById('personal-facture-result');
+    
+    if (searchBtn && searchInput) {
+        searchBtn.addEventListener('click', () => {
+            const orderNumber = searchInput.value.trim().toUpperCase();
+            searchPersonalFacture(orderNumber, resultContainer);
+        });
+        
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const orderNumber = searchInput.value.trim().toUpperCase();
+                searchPersonalFacture(orderNumber, resultContainer);
+            }
+        });
+    }
+}
+
+// Recherche de facture pour la page personnelle
+async function searchPersonalFacture(orderNumber, resultContainer) {
+    if (!orderNumber) {
+        showNotification('Veuillez entrer un numéro de commande', 'error');
+        return;
+    }
+    
+    // Normaliser le numéro de commande (supprimer les tirets et espaces)
+    orderNumber = orderNumber.replace(/-/g, '').replace(/\s/g, '');
+    
+    // Vérifier le format du numéro de commande
+    if (!orderNumber.startsWith('ST') || orderNumber.length !== 8 || isNaN(orderNumber.substring(2))) {
+        showNotification('Numéro de commande invalide. Format: ST123456', 'error');
+        return;
+    }
+    
+    try {
+        // Afficher un indicateur de chargement
+        resultContainer.innerHTML = `
+            <div class="facture-result loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Recherche en cours...</p>
+            </div>
+        `;
+        resultContainer.classList.remove('hidden');
+        
+        // Rechercher la commande dans Firebase
+        const ordersQuery = await db.collection('orders')
+            .where('id', '==', orderNumber)
+            .get();
+        
+        if (ordersQuery.empty) {
+            // Essayer avec l'ancien format (avec tiret) pour compatibilité
+            const oldFormatNumber = orderNumber.substring(0, 2) + '-' + orderNumber.substring(2);
+            const oldFormatQuery = await db.collection('orders')
+                .where('id', '==', oldFormatNumber)
+                .get();
+                
+            if (oldFormatQuery.empty) {
+                resultContainer.innerHTML = `
+                    <div class="facture-result error">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <p>Aucune commande trouvée avec le numéro ${orderNumber}</p>
+                    </div>
+                `;
+                return;
+            } else {
+                // Trouvé avec l'ancien format
+                const orderDoc = oldFormatQuery.docs[0];
+                const orderData = orderDoc.data();
+                displayPersonalOrderResult(orderData, resultContainer);
+            }
+        } else {
+            // Trouvé avec le nouveau format
+            const orderDoc = ordersQuery.docs[0];
+            const orderData = orderDoc.data();
+            displayPersonalOrderResult(orderData, resultContainer);
+        }
+        
+    } catch (error) {
+        console.error('Erreur lors de la recherche:', error);
+        resultContainer.innerHTML = `
+            <div class="facture-result error">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>Une erreur s'est produite lors de la recherche</p>
+            </div>
+        `;
+    }
+}
+
+// Afficher le résultat de la commande dans la page personnelle
+function displayPersonalOrderResult(orderData, resultContainer) {
+    // Afficher le résultat selon le statut
+    if (orderData.status === 'completed') {
+        resultContainer.innerHTML = createFactureResultHTML(orderData, 'completed');
+    } else if (orderData.status === 'rejected') {
+        resultContainer.innerHTML = createFactureResultHTML(orderData, 'rejected');
+    } else {
+        resultContainer.innerHTML = `
+            <div class="facture-result pending">
+                <i class="fas fa-clock"></i>
+                <p>Votre commande ${orderData.id} est en attente de traitement</p>
+                <p>Revenez ultérieurement pour télécharger votre facture</p>
+            </div>
+        `;
+    }
+    
+    resultContainer.classList.remove('hidden');
+    
+    // Ajouter l'écouteur pour le bouton de téléchargement
+    const downloadBtn = resultContainer.querySelector('.download-facture-btn');
+    if (downloadBtn) {
+        downloadBtn.addEventListener('click', () => {
+            generateFacturePDF(orderData, orderData.status);
+        });
+    }
 }
