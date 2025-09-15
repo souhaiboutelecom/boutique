@@ -86,8 +86,8 @@ async function loadData() {
         
         // CATÉGORIES LOCALES (sans Firebase)
         categories = [
-            { id: 'iphone', name: 'iPhone', color: '#1428A0', icon: 'fab fa-apple' },
-            { id: 'samsung', name: 'Samsung', color: '#1428A0', icon: 'fas fa-mobile-alt' },
+{ id: 'iphone', name: 'Iphone', color: '#1428A0', icon: 'fab fa-apple', image: 'https://i.postimg.cc/DfCBxqz3/images.jpg' },
+          { id: 'samsung', name: 'Samsung', color: '#1428A0', icon: 'fas fa-mobile-alt' },
             { id: 'tecno', name: 'Tecno', color: '#0066FF', icon: 'fas fa-mobile-alt' },
             { id: 'autres', name: 'Autres marques', color: '#222222', icon: 'fas fa-mobile-alt' },
             { id: 'ecouteur', name: 'Écouteur', color: '#3A3A3A', icon: 'fas fa-headphones' },
