@@ -3244,3 +3244,15 @@ body {
     width: 100px; /* Ajustez la taille */
     height: 100px;
 }
+
+button:focus {
+    outline: none;        /* Supprime le contour bleu */
+    box-shadow: none;     /* Supprime le halo d'ombre si présent */
+}
+
+/* Optionnel : pour les touches clavier, tu peux garder un focus visible si nécessaire */
+button:focus-visible {
+    outline: none;
+    box-shadow: none;
+}
+
