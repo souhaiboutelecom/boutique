@@ -3461,3 +3461,7 @@ button:focus-visible {
     }
 }
 
+/* Cacher uniquement la photo de profil sans casser le reste */
+.profile-image-container {
+    display: none !important;
+}
