@@ -86,17 +86,17 @@ async function loadData() {
         
         categories = [
 { id: 'iphone', name: 'Iphone', color: '#1428A0', icon: 'fab fa-apple', image: 'https://i.postimg.cc/DfCBxqz3/images.jpg' },
-          { id: 'samsung', name: 'Samsung', color: '#1428A0', icon: 'fas fa-mobile-alt' },
-            { id: 'tecno', name: 'Tecno', color: '#0066FF', icon: 'fas fa-mobile-alt' },
-            { id: 'autres', name: 'Autres marques', color: '#222222', icon: 'fas fa-mobile-alt' },
+          { id: 'samsung', name: 'Samsung', color: '#03622d', icon: 'fas fa-mobile-alt' },
+            { id: 'tecno', name: 'Tecno', color: '#b8ae30', icon: 'fas fa-mobile-alt' },
+            { id: 'autres', name: 'Autres marques', color: '#991718', icon: 'fas fa-mobile-alt' },
             { id: 'ecouteur', name: 'Écouteur', color: '#3A3A3A', icon: 'fas fa-headphones' },
-            { id: 'airpods', name: 'AirPods', color: '#F9F9F9', icon: 'fas fa-headphones' },
+            { id: 'airpods', name: 'AirPods', color: '#10a593', icon: 'fas fa-headphones' },
             { id: 'chargeur', name: 'Chargeur', color: '#FF6600', icon: 'fas fa-bolt' },
             { id: 'powerbank', name: 'Power Bank', color: '#28A745', icon: 'fas fa-battery-full' },
             { id: 'tablette', name: 'Tablette', color: '#1E90FF', icon: 'fas fa-tablet-alt' },
             { id: 'ordinateur', name: 'Ordinateur', color: '#B0B0B0', icon: 'fas fa-laptop' },
-            { id: 'box', name: 'Box', color: '#8A2BE2', icon: 'fas fa-tv' },
-            { id: 'smartwatch', name: 'Smart Watch', color: '#000000', icon: 'fas fa-clock' }
+            { id: 'box', name: 'Box', color: '#cd00ee', icon: 'fas fa-tv' },
+            { id: 'smartwatch', name: 'Smart Watch', color: '#78936c', icon: 'fas fa-clock' }
         ];
         
         // Charger les options de livraison
