@@ -726,7 +726,7 @@ body {
 
 .contact-info h3 i {
     margin-right: 10px;
-    color: #D4AF37;
+    color: #1e40af;
 }
 
 .contact-info p, .contact-info a {
@@ -769,36 +769,60 @@ body {
 
 .admin-menu {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 2px; /* réduit l'espace entre boutons */
+    grid-template-columns: repeat(4, 1fr); /* 4 colonnes */
+    gap: 6px;
     margin-bottom: 10px;
+    width: 100%; /* occuper toute la largeur */
+    box-sizing: border-box; 
 }
 
+/* Boutons */
 .admin-btn {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 2px 2px;  
+    padding: 8px;  
     background-color: #f8f9fa;
     border: 1px solid #ddd;
-    border-radius: 3px; 
+    border-radius: 6px; 
     cursor: pointer;
     text-align: center;
-    min-width: 20px;
-    min-height: 20px;  /* hauteur minimum */
+    min-width: 0; /* empêche de forcer une largeur */
+    min-height: 60px; /* hauteur correcte pour cliquer */
+    transition: all 0.2s ease;
+}
+
+.admin-btn:hover {
+    background-color: #f1f1f1;
+    transform: translateY(-2px);
 }
 
 .admin-btn i {
-    font-size: 16px; /* icône plus petite */
-    margin-bottom: 3px;
-    color: #D4AF37;
+    font-size: 18px;
+    margin-bottom: 5px;
+    color: #1e40af;
 }
 
 .admin-btn span {
-    font-size: 10px; /* texte plus petit */
+    font-size: 12px;
     font-weight: 500;
+    color: #333;
 }
+
+/* --- Responsive --- */
+@media (max-width: 600px) {
+    .admin-menu {
+        grid-template-columns: repeat(2, 1fr); /* 2 colonnes sur petit écran */
+    }
+}
+
+@media (max-width: 400px) {
+    .admin-menu {
+        grid-template-columns: repeat(1, 1fr); /* 1 colonne sur écran très petit */
+    }
+}
+
 
 .admin-view {
     background-color: #f8f9fa;
@@ -880,7 +904,7 @@ body {
 
 .submit-btn {
     padding: 12px 20px;
-    background-color: #D4AF37;
+    background-color: #1e40af;
     color: white;
     border: none;
     border-radius: 8px;
@@ -1065,7 +1089,7 @@ body {
 }
 
 .nav-item.active {
-    color: #D4AF37;
+    color: #1e40af;
 }
 
 .nav-item i {
@@ -1112,11 +1136,11 @@ body {
 }
 
 .notification.success {
-    background-color: #28a745;
+    background-color: #0b8c28;
 }
 
 .notification.error {
-    background-color: #ff4444;
+    background-color: #e03f35;
 }
 
 /* Utilitaires */
@@ -1197,41 +1221,60 @@ body {
 
 .admin-menu {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    margin-bottom: 20px;
+    grid-template-columns: repeat(4, 1fr); /* 4 colonnes */
+    gap: 6px;
+    margin-bottom: 10px;
+    width: 100%; /* occuper toute la largeur */
+    box-sizing: border-box; 
 }
 
+/* Boutons */
 .admin-btn {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 15px 10px;
+    padding: 8px;  
     background-color: #f8f9fa;
     border: 1px solid #ddd;
-    border-radius: 8px;
+    border-radius: 6px; 
     cursor: pointer;
     text-align: center;
-    transition: all 0.3s ease;
+    min-width: 0; /* empêche de forcer une largeur */
+    min-height: 60px; /* hauteur correcte pour cliquer */
+    transition: all 0.2s ease;
 }
 
 .admin-btn:hover {
-    background-color: #e9ecef;
+    background-color: #f1f1f1;
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 .admin-btn i {
-    font-size: 24px;
-    margin-bottom: 10px;
+    font-size: 18px;
+    margin-bottom: 5px;
     color: #D4AF37;
 }
 
 .admin-btn span {
     font-size: 12px;
     font-weight: 500;
+    color: #333;
 }
+
+/* --- Responsive --- */
+@media (max-width: 600px) {
+    .admin-menu {
+        grid-template-columns: repeat(4, 1fr); /* 2 colonnes sur petit écran */
+    }
+}
+
+@media (max-width: 400px) {
+    .admin-menu {
+        grid-template-columns: repeat(4, 1fr); /* 1 colonne sur écran très petit */
+    }
+}
+
 
 .admin-view {
     background-color: #f8f9fa;
