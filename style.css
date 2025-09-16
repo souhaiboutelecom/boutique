@@ -2157,7 +2157,9 @@ body {
     display: flex;
     height: 100%;
     width: max-content;
-    animation: infiniteScroll 40s linear infinite;
+    /* REMPLACER la ligne suivante */
+    /* animation: infiniteScroll 40s linear infinite; */
+    animation: scrollOnce 30s linear forwards; /* Nouvelle animation */
 }
 
 .carousel-item {
