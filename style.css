@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
 /* Reset et styles de base */
 * {
     margin: 0;
@@ -3340,3 +3342,31 @@ button:focus-visible {
 .category-card:hover {
   transform: scale(1.05);
 }
+
+.top-bar {
+    background-color: #28a745; /* vert */
+    position: relative;        /* position normale dans le flux */
+    left: 50%;                 /* on décale de 50% */
+    right: 50%;
+    margin-left: -50vw;        /* compensation pour toucher le bord gauche */
+    margin-right: -50vw;       /* compensation pour toucher le bord droit */
+      margin-top: -12px; /* ← remonte la barre de 5px, ajuste selon ton besoin */
+
+    width: 100vw;              /* largeur de la fenêtre */
+    padding: 5px 0;            /* hauteur de la barre */
+    text-align: center;        /* texte centré */
+    color: #fff;               /* texte blanc */
+    font-weight: 500;
+    border-radius: 0;          /* pas d’arrondi */
+    box-shadow: none;          /* pas d’ombre */
+    font-size: 14px;
+}
+
+.top-bar p {
+    margin: 0;
+    line-height: 1.4;
+}
+
+
+
+
