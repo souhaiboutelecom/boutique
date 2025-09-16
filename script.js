@@ -3628,7 +3628,7 @@ doc.text('Excellence en Électronique & Accessoires', pageWidth / 2, 35, { align
     if (isCompleted) {
         // Signature pour commande validée
         try {
-            doc.addImage('https://i.postimg.cc/hjj2Tg3D/Captur-ERGVERGe.png', 'PNG', pageWidth - 60, yPosition, 40, 20);
+            doc.addImage('https://i.postimg.cc/mDC2b0Lf/Cam-Scanner-05-09-2025-22-36-pdf.png', 'PNG', pageWidth - 60, yPosition, 40, 20);
             doc.setFontSize(10);
             doc.setTextColor(...secondaryColor);
             doc.text('Signature', pageWidth - 40, yPosition + 25, { align: 'center' });
@@ -3638,7 +3638,7 @@ doc.text('Excellence en Électronique & Accessoires', pageWidth / 2, 35, { align
     } else {
         // Image pour commande rejetée
         try {
-            doc.addImage('https://i.postimg.cc/0NhhGMvc/pons-pneus-muret-midi-pyrenees-siligom-pneus-pas-cher-michelin-continental-AMBI-PNEUS-HD.webp', 'WEBP', pageWidth / 2 - 25, yPosition, 50, 25);
+            doc.addImage('https://i.postimg.cc/438FYd3p/st.png', 'PNG', pageWidth / 2 - 25, yPosition, 50, 25);
             doc.setFontSize(10);
             doc.setTextColor(200, 60, 60);
             doc.text('COMMANDE REJETÉE', pageWidth / 2, yPosition + 30, { align: 'center' });
