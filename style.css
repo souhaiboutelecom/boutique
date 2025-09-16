@@ -3256,3 +3256,44 @@ button:focus-visible {
     box-shadow: none;
 }
 
+.categories-section {
+  padding: 15px;
+}
+
+.categories-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  text-align: left;
+}
+
+/* Grille 4 par ligne (même sur mobile) */
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.category-card {
+  width: 100%;
+  padding-top: 100%; /* carré parfait */
+  background-size: cover;
+  background-position: center;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.category-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.category-card {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.category-card:hover {
+  transform: scale(1.05);
+}
