@@ -650,14 +650,24 @@ function openProductPage(product) {
     });
     
     // Ajout au panier
-    const addToCartBtn = document.querySelector('.add-to-cart-btn');
-    addToCartBtn.addEventListener('click', () => {
-        addToCart(product, quantity);
-        showNotification('Produit ajouté au panier', 'success');
-        quantity = 1;
-        updateQuantity();
-    });
+// Ajout au panier - avec prévention du double clic
+const addToCartBtn = document.querySelector('.add-to-cart-btn');
+// Supprimer d'abord tout écouteur existant pour éviter les doublons
+addToCartBtn.replaceWith(addToCartBtn.cloneNode(true));
+const newAddToCartBtn = document.querySelector('.add-to-cart-btn');
+
+newAddToCartBtn.addEventListener('click', () => {
+    addToCart(product, quantity);
+    showNotification('Produit ajouté au panier', 'success');
+    quantity = 1;
+    updateQuantity();
     
+    // Désactiver temporairement le bouton pour éviter les doubles clics
+    newAddToCartBtn.disabled = true;
+    setTimeout(() => {
+        newAddToCartBtn.disabled = false;
+    }, 500);
+});
     // Favoris
     const favoriteBtn = document.querySelector('.favorite-btn');
     const isFavorite = favorites.some(fav => fav.id === product.id);
@@ -3965,7 +3975,6 @@ document.querySelectorAll('.category-card').forEach(card => {
         }
     });
 });
-
 
 
 
