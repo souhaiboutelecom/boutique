@@ -3449,4 +3449,15 @@ button:focus-visible {
     display: block; /* force l’affichage */
 }
 
+@media (max-width: 600px) {
+    .profile-container {
+        width: 90px;
+        height: 90px;
+    }
+
+    .profile-container img {
+        max-width: 90px;
+        max-height: 90px;
+    }
+}
 
