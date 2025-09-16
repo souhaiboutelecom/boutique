@@ -206,15 +206,63 @@ body {
 }
 
 .category-bar.blue {
-    background-color: #1e90ff;
+    /* Dégradé bleu brillant réaliste */
+    background: linear-gradient(
+        90deg,
+        #1E90FF 0%,   /* bleu standard */
+        #63B3FF 25%,  /* bleu clair brillant */
+        #3399FF 50%,  /* bleu intense */
+        #1C86EE 75%,  /* bleu moyen foncé */
+        #1E90FF 100%  /* bleu standard */
+    );
+    color: #fff; /* texte blanc pour contraste */
+    text-shadow: 0 1px 1px rgba(0,0,0,0.2); /* léger relief texte */
 }
+
 
 .category-bar.red {
-    background-color: #e03f35;
+    /* Dégradé rouge métallique réaliste */
+    background: linear-gradient(
+        90deg,
+        #8B0000 0%,    /* très sombre, ombre profonde */
+        #B22222 20%,   /* rouge foncé */
+        #E03F35 50%,   /* rouge principal */
+        #FF6347 70%,   /* rouge lumineux, reflet */
+        #FF7F7F 100%   /* rouge clair brillant */
+    );
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3); /* léger relief pour texte */
+    border-radius: 0;
 }
 
+
 .category-bar.light-blue {
-    background-color: #4b4342;
+    /* Dégradé or réaliste différent du précédent */
+    background: linear-gradient(
+        90deg,
+        #C19A6B 0%,   /* or chaud foncé */
+        #D4AF37 20%,  /* or classique lumineux */
+        #FFD700 50%,  /* or vif, point lumineux central */
+        #FFE066 70%,  /* or clair reflet */
+        #FBE8A6 100%  /* or très clair, effet brillant */
+    );
+    color: #fff; /* texte blanc pour contraste */
+    text-shadow: 0 1px 2px rgba(0,0,0,0.25); /* léger relief texte */
+    border-radius: 0; /* pas d’arrondi */
+}
+
+.category-bar.light-blue .bar-title p {
+    color: #8a5f00;           /* texte noir */
+    font-size: 18px;       /* taille augmentée, ajuste selon besoin */
+    text-align: center;    /* texte centré horizontalement */
+    margin: 0;             /* supprime les marges par défaut */
+    line-height: 1.4;      /* centrer verticalement si nécessaire */
+}
+
+.category-bar.light-blue .bar-title p i {
+    color: #f2ff00;   /* doré réaliste pour la couronne */
+    margin-right: 8px; /* espace entre l’icône et le texte */
+    font-size: 20px;   /* un peu plus grande que le texte */
 }
 
 .bar-content {
