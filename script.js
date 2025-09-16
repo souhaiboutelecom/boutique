@@ -84,7 +84,6 @@ async function loadData() {
             ...doc.data()
         }));
         
-        // CATÉGORIES LOCALES (sans Firebase)
         categories = [
 { id: 'iphone', name: 'Iphone', color: '#1428A0', icon: 'fab fa-apple', image: 'https://i.postimg.cc/DfCBxqz3/images.jpg' },
           { id: 'samsung', name: 'Samsung', color: '#1428A0', icon: 'fas fa-mobile-alt' },
@@ -237,7 +236,13 @@ function setupEventListeners() {
             processOrder(); // Appelle ta fonction de commande
         });
     }
-
+// Ajoutez ce code à la fin de votre fonction initApp() ou setupEventListeners()
+document.querySelectorAll('.category-card').forEach(card => {
+    card.addEventListener('click', function() {
+        const categoryId = this.id; // Utilise l'ID comme nom de catégorie
+        openCategoryPage(categoryId);
+    });
+});
     // Voir plus de catégories
     document.querySelectorAll('.see-more').forEach(link => {
         link.addEventListener('click', (e) => {
@@ -697,49 +702,21 @@ function openFullscreenImage(imageUrl) {
     document.getElementById('image-modal').classList.remove('hidden');
 }
 
-// Ouverture d'une page de catégorie
 function openCategoryPage(categoryId) {
     navigateTo('category-page');
     
-    const category = categories.find(cat => cat.id === categoryId);
-    document.getElementById('category-title').textContent = category.name;
+    // Mettre à jour le titre de la catégorie
+    document.getElementById('category-title').textContent = categoryId;
     
     const container = document.getElementById('category-products');
     container.innerHTML = '';
     
-    let categoryProducts = [];
+    // Filtrer les produits par catégorie
+    const categoryProducts = products.filter(product => 
+        product.category.toLowerCase() === categoryId.toLowerCase()
+    );
     
-    if (categoryId.startsWith('price-')) {
-        // Filtrage par prix
-        const maxPrice = parseInt(categoryId.split('-')[1]) * 1000;
-        let minPrice = 0;
-        
-        switch(categoryId) {
-            case 'price-100k':
-                minPrice = 70000;
-                break;
-            case 'price-70k':
-                minPrice = 50000;
-                break;
-            case 'price-50k':
-                minPrice = 25000;
-                break;
-            case 'price-25k':
-                minPrice = 0;
-                break;
-        }
-        
-        categoryProducts = products.filter(product => {
-            const price = product.salePrice || product.normalPrice;
-            return price >= minPrice && price <= maxPrice;
-        });
-    } else {
-        // Filtrage par catégorie normale
-        categoryProducts = products.filter(product => 
-            product.category.toLowerCase() === categoryId.toLowerCase()
-        );
-    }
-    
+    // Afficher les produits de la catégorie
     categoryProducts.forEach(product => {
         container.appendChild(createProductCard(product));
     });
@@ -3959,3 +3936,32 @@ function prefillCheckoutForm() {
         document.getElementById('customer-address').value = userProfile.address;
     }
 }
+
+// Attendre que la page soit prête
+// Activer le clic sur chaque palette
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".category-card").forEach(card => {
+    card.addEventListener("click", () => {
+      const id = card.id;
+      // Utilise ta fonction existante pour ouvrir la catégorie
+      if (typeof openCategoryPage === "function") {
+        openCategoryPage(id);
+      } else {
+        // fallback si openCategoryPage n’existe pas
+        window.location.href = `categorie.html?id=${id}`;
+      }
+    });
+  });
+});
+
+// Ajoutez ce code dans votre fonction setupEventListeners() ou initApp()
+
+// Gestion du clic sur les catégories
+document.querySelectorAll('.category-card').forEach(card => {
+    card.addEventListener('click', () => {
+        const categoryId = card.getAttribute('data-category');
+        if (categoryId) {
+            openCategoryPage(categoryId);
+        }
+    });
+});
