@@ -3344,23 +3344,34 @@ button:focus-visible {
 }
 
 .top-bar {
-    background-color: #28a745; /* vert */
-    position: relative;        /* position normale dans le flux */
-    left: 50%;                 /* on décale de 50% */
+    position: relative;
+    left: 50%; 
     right: 50%;
-    margin-left: -50vw;        /* compensation pour toucher le bord gauche */
-    margin-right: -50vw;       /* compensation pour toucher le bord droit */
-      margin-top: -12px; /* ← remonte la barre de 5px, ajuste selon ton besoin */
-
-    width: 100vw;              /* largeur de la fenêtre */
-    padding: 5px 0;            /* hauteur de la barre */
-    text-align: center;        /* texte centré */
-    color: #fff;               /* texte blanc */
-    font-weight: 500;
-    border-radius: 0;          /* pas d’arrondi */
-    box-shadow: none;          /* pas d’ombre */
+    margin-left: -50vw; 
+    margin-right: -50vw; 
+    margin-top: -12px; 
+    width: 100vw; 
+    padding: 7px 0; 
+    text-align: center; 
+    font-weight: 500; 
+    border-radius: 0; 
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* léger relief */
     font-size: 14px;
+
+    /* Dégradé or brillant */
+    background: linear-gradient(
+        90deg, 
+        #FFD700 0%,    /* jaune or clair */
+        #FFEC8B 20%,   /* or brillant clair */
+        #FFC107 40%,   /* or moyen */
+        #FFB300 60%,   /* or intense */
+        #FFD700 80%,   /* jaune or clair */
+        #FFE066 100%   /* reflet */
+    );
+    color: #fff; /* texte blanc pour contraste */
+    text-shadow: 0 1px 1px rgba(0,0,0,0.2); /* léger effet relief texte */
 }
+
 
 .top-bar p {
     margin: 0;
