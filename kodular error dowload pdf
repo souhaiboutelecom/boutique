@@ -42,7 +42,6 @@ const elements = {
     notificationText: document.getElementById('notification-text')
 };
 
-
 // Initialisation de l'application
 function initApp() {
     checkConnection();
@@ -50,11 +49,8 @@ function initApp() {
     setupEventListeners();
     startCountdown();
     loadAds();
-    
-    // Rediriger directement vers la page personnelle
-    navigateTo('personal-page');
-    loadPersonalPage();
 }
+
 // Vérification de la connexion
 function checkConnection() {
     const statusElement = elements.connectionStatus;
@@ -3453,10 +3449,12 @@ function createFactureResultHTML(orderData, status) {
                 <p><strong>Client:</strong> ${orderData.customerName}</p>
                 <p><strong>Total:</strong> ${formatPrice(orderData.total)} FCFA</p>
                 <p><strong>Statut:</strong> ${isCompleted ? 'Validée' : 'Rejetée'}</p>
+                 <p><strong>Télécharger le pdf dans le site dans la page "Mon Compte"</strong></p>
             </div>
-            <button class="download-facture-btn">
-                <i class="fas fa-download"></i> Télécharger le PDF
-            </button>
+          <a href="https://souhaiboutelecom.github.io/boutique/" target="_blank" class="download-facture-btn">
+    <i class="fas fa-external-link-alt"></i> Ouvrir le site
+</a>
+
         </div>
     `;
 }
