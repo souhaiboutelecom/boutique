@@ -49,6 +49,8 @@ function initApp() {
     setupEventListeners();
     startCountdown();
     loadAds();
+      setupPDFDownload();
+
 }
 
 // Vérification de la connexion
@@ -3979,4 +3981,28 @@ document.querySelectorAll('.category-card').forEach(card => {
 
 
 
+// Solution alternative ultra-simple
+function setupPDFDownload() {
+    document.addEventListener('click', function(e) {
+        if (e.target.matches('#download-facture, .download-facture-btn, #download-pdf-btn, #download-pdf-rejected-btn, .download-receipt-btn')) {
+            e.preventDefault();
+            
+            // Ouvrir un nouvel onglet avec un message
+            const newTab = window.open('', '_blank');
+            newTab.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Redirection pour téléchargement</title>
+                    <meta http-equiv="refresh" content="0; url='https://votre-domaine.com/telechargement.html'" />
+                </head>
+                <body>
+                    <p>Redirection en cours...</p>
+                </body>
+                </html>
+            `);
+            newTab.document.close();
+        }
+    });
+}
 
