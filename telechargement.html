@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Téléchargement - SOUHAIBOU TÉLÉCOM</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+            background: linear-gradient(135deg, #1428A0 0%, #2d5be3 100%);
+            color: white;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            width: 90%;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .btn {
+            background: white;
+            color: #1428A0;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 25px;
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+        }
+    </style>
+    <script>
+        // Téléchargement automatique au chargement de la page
+        window.onload = function() {
+            // Récupérer le filename depuis l'URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const filename = urlParams.get('filename') || 'document.pdf';
+            
+            // Simuler un téléchargement (dans la pratique, vous serviriez le fichier depuis le serveur)
+            setTimeout(() => {
+                alert('Téléchargement de ' + filename + ' simulé');
+                // Ici, vous ajouteriez le code pour servir le fichier réel
+            }, 2000);
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Téléchargement</h1>
+        <p>Votre document est en cours de préparation...</p>
+        <p>Le téléchargement devrait démarrer automatiquement.</p>
+        <a href="#" class="btn" id="manual-download">Télécharger manuellement</a>
+    </div>
+</body>
+</html>
