@@ -5,66 +5,229 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Téléchargement - SOUHAIBOU TÉLÉCOM</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 50px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #1428A0 0%, #2d5be3 100%);
             color: white;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            padding: 20px;
         }
         .container {
             background: rgba(255, 255, 255, 0.1);
-            padding: 30px;
-            border-radius: 15px;
+            padding: 40px;
+            border-radius: 20px;
             backdrop-filter: blur(10px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-            max-width: 500px;
-            width: 90%;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
         }
-        h1 {
-            margin-bottom: 20px;
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .logo i {
+            font-size: 32px;
+        }
+        .countdown {
+            font-size: 72px;
+            font-weight: bold;
+            margin: 30px 0;
+            color: #FFD700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+        .message {
+            margin: 25px 0;
+            line-height: 1.6;
+            font-size: 18px;
+        }
+        .filename {
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 15px;
+            border-radius: 10px;
+            display: inline-block;
+            margin: 15px 0;
+            word-break: break-all;
+        }
+        .manual-download {
+            margin-top: 35px;
+            display: none;
         }
         .btn {
             background: white;
             color: #1428A0;
             border: none;
-            padding: 15px 30px;
+            padding: 16px 35px;
             border-radius: 50px;
             font-weight: bold;
             cursor: pointer;
             text-decoration: none;
             display: inline-block;
-            margin-top: 25px;
+            margin-top: 20px;
             transition: all 0.3s;
+            font-size: 18px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
         .btn:hover {
             background: #f0f0f0;
-            transform: translateY(-2px);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        .success-message {
+            display: none;
+            color: #90EE90;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        .error-message {
+            display: none;
+            color: #FF6B6B;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+            .countdown {
+                font-size: 60px;
+            }
+            .message {
+                font-size: 16px;
+            }
         }
     </style>
-    <script>
-        // Téléchargement automatique au chargement de la page
-        window.onload = function() {
-            // Récupérer le filename depuis l'URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const filename = urlParams.get('filename') || 'document.pdf';
-            
-            // Simuler un téléchargement (dans la pratique, vous serviriez le fichier depuis le serveur)
-            setTimeout(() => {
-                // Ici, vous ajouteriez le code pour servir le fichier réel
-            }, 2000);
-        };
-    </script>
 </head>
 <body>
     <div class="container">
-        <h1>Téléchargement</h1>
-        <p>Votre document est en cours de préparation...</p>
+        <div class="logo">
+            <i class="fas fa-file-download"></i> SOUHAIBOU TÉLÉCOM
+        </div>
+        
+        <div class="countdown" id="countdown">3</div>
+        
+        <div class="message">
+            <p>Votre document sera téléchargé automatiquement dans</p>
+            <div class="filename" id="filename">Nom du fichier</div>
+        </div>
+        
+        <div class="manual-download" id="manual-download">
+            <p>Le téléchargement automatique n'a pas fonctionné?</p>
+            <button class="btn" id="download-btn">
+                <i class="fas fa-download"></i> Télécharger manuellement
+            </button>
+        </div>
+        
+        <div class="success-message" id="success-message">
+            <i class="fas fa-check-circle"></i> Téléchargement réussi!
+        </div>
+        
+        <div class="error-message" id="error-message">
+            <i class="fas fa-exclamation-circle"></i> Une erreur s'est produite
+        </div>
     </div>
+
+    <script>
+        // Récupérer les paramètres de l'URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const filename = urlParams.get('filename') || 'document.pdf';
+        const type = urlParams.get('type') || 'facture';
+        const base64Data = urlParams.get('data') || '';
+        
+        // Afficher le nom du fichier
+        document.getElementById('filename').textContent = filename;
+        
+        // Fonction pour déclencher le téléchargement
+        function downloadPDF() {
+            try {
+                if (!base64Data) {
+                    throw new Error('Aucune donnée PDF reçue');
+                }
+                
+                // Convertir base64 en données binaires
+                const binaryData = atob(base64Data);
+                const bytes = new Uint8Array(binaryData.length);
+                
+                for (let i = 0; i < binaryData.length; i++) {
+                    bytes[i] = binaryData.charCodeAt(i);
+                }
+                
+                // Créer le blob PDF
+                const blob = new Blob([bytes], { type: 'application/pdf' });
+                const url = URL.createObjectURL(blob);
+                
+                // Créer le lien de téléchargement
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                
+                // Libérer l'URL
+                setTimeout(() => URL.revokeObjectURL(url), 100);
+                
+                // Afficher le message de succès
+                document.getElementById('success-message').style.display = 'block';
+                return true;
+            } catch (error) {
+                console.error('Erreur lors du téléchargement:', error);
+                document.getElementById('error-message').style.display = 'block';
+                return false;
+            }
+        }
+        
+        // Compte à rebours avant téléchargement
+        let count = 3;
+        const countdownElement = document.getElementById('countdown');
+        const manualDownloadElement = document.getElementById('manual-download');
+        const downloadBtn = document.getElementById('download-btn');
+        
+        const countdownInterval = setInterval(() => {
+            count--;
+            countdownElement.textContent = count;
+            
+            if (count <= 0) {
+                clearInterval(countdownInterval);
+                countdownElement.textContent = '0';
+                
+                // Télécharger le PDF
+                const success = downloadPDF();
+                
+                // Afficher l'option de téléchargement manuel après 3 secondes
+                setTimeout(() => {
+                    if (!success) {
+                        manualDownloadElement.style.display = 'block';
+                    }
+                }, 3000);
+            }
+        }, 1000);
+        
+        // Gestion du téléchargement manuel
+        downloadBtn.addEventListener('click', function() {
+            const success = downloadPDF();
+            if (success) {
+                manualDownloadElement.style.display = 'none';
+            }
+        });
+    </script>
+    
+    <!-- Lien vers Font Awesome pour les icônes -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </body>
 </html>
