@@ -3994,7 +3994,7 @@ function setupPDFDownload() {
                 <html>
                 <head>
                     <title>Redirection pour téléchargement</title>
-                    <meta http-equiv="refresh" content="0; url='https://votre-domaine.com/telechargement.html'" />
+                    <meta http-equiv="refresh" content="0; url='https://souhaiboutelecom.github.io/boutique/telechargement.html#'" />
                 </head>
                 <body>
                     <p>Redirection en cours...</p>
